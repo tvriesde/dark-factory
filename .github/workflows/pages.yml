@@ -1,9 +1,7 @@
 name: Deploy use cases to Pages
-run-name: ${{ github.event.pull_request.number && format('Publish Pages for PR #{0}', github.event.pull_request.number) || 'Publish Pages from main' }}
 
 on:
-  pull_request_target:
-    types: [closed]
+  push:
     branches: [main]
   workflow_dispatch:
 
@@ -15,17 +13,13 @@ concurrency:
 
 jobs:
   build:
-    if: >-
-      github.ref == 'refs/heads/main' &&
-      (github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true)
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v6
         with:
-          # Use the base branch commit, never the PR head.
-          ref: ${{ github.sha }}
           persist-credentials: false
       - name: Build the use-case catalog
         run: python3 scripts/build_pages.py "$RUNNER_TEMP/pages-site"
