@@ -14,7 +14,7 @@ repository and delivered in one issue-linked pull request. See
 | Architect | Specifies the files, interactions, technical constraints, and verification approach. |
 | Developer | Creates or updates the HTML and design notes in the selected directory. |
 | Tester | Checks the actual prototype in the browser and reports evidence against the criteria. |
-| Deployment | Verifies the generated Pages catalog before the PR opens. |
+| Deployment | Verifies the generated Pages catalog and opens the PR into `main` for maintainer review. |
 
 ## Start from an issue on GitHub
 
@@ -47,16 +47,18 @@ Use this automation prompt:
 
 Before enabling it for routine use, confirm in a smoke run that the cloud
 session can invoke the named profiles, share implementation changes with
-Tester, and publish one issue-linked PR with the selected tools. If the
+Tester and Deployment, and let Deployment publish one issue-linked PR with
+the selected tools. If the
 automation cannot run the profiles, use the manual Triage entry point rather
 than allowing it to skip the specialists.
 
-Review is optional per issue. Selecting **Pause for maintainer approval** stops
+Scope review before implementation is optional per issue. Selecting **Pause for maintainer approval** stops
 after scope and draft design, before implementation or any Figma write. To
 resume, have a maintainer start Triage on that same issue and explicitly
 approve the recorded scope and, if applicable, Figma destination in the
-assignment instructions. GitHub branch rules and required PR reviews still
-apply; this workflow never merges.
+assignment instructions. Once Deployment opens the PR, a maintainer reviews
+and merges it in GitHub. The agents never approve or merge it. To enforce
+review in GitHub itself, configure a pull request review rule for `main`.
 
 ## Publish to GitHub Pages
 
@@ -66,10 +68,11 @@ plan supports Pages for private repositories and that GitHub Actions is
 enabled. Check site visibility before publishing: a private repository does
 not automatically make its Pages site private.
 
-When a pull request is merged into `main`, GitHub Actions publishes the
-generated catalog. An approval without a merge, or a PR closed without merging,
-does not publish. No Copilot Automation, MCP server, or personal access token is
-needed. If you configured `pages-actions` and `COPILOT_MCP_PAGES_ACTIONS_AUTH`
+Every push to `main`, including a merged pull request, triggers GitHub Actions
+to publish the generated catalog. Approval alone, closing a PR without merging,
+and feature-branch pushes do not publish. No Copilot Automation, MCP server,
+or personal access token is needed for Pages. If you configured
+`pages-actions` and `COPILOT_MCP_PAGES_ACTIONS_AUTH`
 solely for this site, you can remove both and revoke the unused token.
 
 To publish on demand, use **Actions > Deploy use cases to Pages > Run workflow**
