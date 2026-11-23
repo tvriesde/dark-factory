@@ -17,8 +17,8 @@ Use synthetic data only: a private repository does not imply a private site.
 Do not change source files or commit the generated artifact.
 
 Return `ready` or `blocked`, the verified case route, and evidence. A ready
-verdict means eligible for publication, not live. After Triage opens the PR
-and it lands on `main`, the separate Deployment Publisher run dispatches
-**Deploy use cases to Pages**. Do not merge the PR, deploy from a feature branch, or change
-repository settings. Report any known Pages configuration blocker separately
-from artifact readiness.
+verdict means eligible for publication, not live. Once a maintainer merges
+the PR into `main`, GitHub Actions runs **Deploy use cases to Pages**.
+Do not merge the PR, deploy from a feature branch, or change repository
+settings. Report known Pages configuration blockers separately from artifact
+readiness.
