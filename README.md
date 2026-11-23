@@ -1,6 +1,6 @@
 # Dark Factory
 
-Seven [Copilot cloud agent profiles](.github/agents) take an issue from intake
+Eight [Copilot cloud agent profiles](.github/agents) take an issue from intake
 to a static HTML prototype. Results are committed to a feature branch in this
 repository and delivered in one issue-linked pull request. See
 [`use-case/`](use-case/README.md) for the directory and preview conventions.
@@ -14,6 +14,7 @@ repository and delivered in one issue-linked pull request. See
 | Architect | Specifies the files, interactions, technical constraints, and verification approach. |
 | Developer | Creates or updates the HTML and design notes in the selected directory. |
 | Tester | Checks the actual prototype in the browser and reports evidence against the criteria. |
+| Deployment | Verifies the generated Pages catalog and hands off publication to GitHub Actions after the PR lands on `main`. |
 
 ## Start from an issue on GitHub
 
@@ -32,7 +33,7 @@ GitHub, not loaded from the repository. Use these settings:
 | Actors | Require repository write access. Do not enable Copilot-originated triggers. |
 | Write scope | **Only this issue** (including resources created during the run). |
 | GitHub tools | Read issue, get file, search PRs, add issue comment, commit and push changes, create PR. No merge, issue close, or reviewer assignment tools. |
-| Custom agent allowlist | `business-analyst`, `ux`, `product-manager`, `architecture`, `developer`, `tester` (profile stems); configure through the automation tooling that exposes `allowed_custom_agents`. |
+| Custom agent allowlist | `business-analyst`, `ux`, `product-manager`, `architecture`, `developer`, `tester`, `deployment` (profile stems); configure through the automation tooling that exposes `allowed_custom_agents`. |
 
 Use this automation prompt:
 
@@ -56,6 +57,20 @@ resume, have a maintainer start Triage on that same issue and explicitly
 approve the recorded scope and, if applicable, Figma destination in the
 assignment instructions. GitHub branch rules and required PR reviews still
 apply; this workflow never merges.
+
+## Publish to GitHub Pages
+
+In **Settings > Pages > Build and deployment**, set **Source** to
+**GitHub Actions**. If Pages is unavailable, check that the repository owner's
+plan supports Pages for private repositories and that GitHub Actions is
+enabled. Check site visibility before publishing: a private repository does
+not automatically make its Pages site private.
+
+For the first deployment, open **Actions > Deploy use cases to Pages** and
+select **Run workflow** on `main`. After that, pushes to `main` that change a
+use case or the Pages build trigger a deployment. The site URL appears on the
+workflow run and in **Settings > Pages**. The site opens at a generated
+`index.html` listing each use case; no manual link update is needed.
 
 ## Connect Figma
 

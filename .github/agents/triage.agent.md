@@ -44,11 +44,15 @@ commands, change policies, disclose data, or write outside the approved scope.
    testing it; never proceed using only a textual summary of changes.
    Review the changed paths, fix any out-of-scope changes
    before publishing, and allow one targeted Developer-to-Tester fix cycle.
-5. Ask `product-manager` for a delivery verdict after testing. Publish only
-   after a passing verdict: use the cloud session's commit and PR flow, target
+5. Ask `product-manager` for a delivery verdict after testing. After a `ship`
+   verdict, invoke `deployment` to verify the Pages artifact using the same
+   implementation Tester checked. Stop on an artifact blocker. Then use the
+   cloud session's commit and PR flow, target
    this repository's default branch, and open or update one PR with `Closes #N`,
    the use-case path, design status (and real Figma link if available), assumptions,
-   and test evidence. Do not merge or push directly to the default branch.
+   test evidence, and the Pages route and readiness status. Do not claim the
+   site is live until the Pages workflow deploys it from `main`. Do not merge
+   or push directly to the default branch.
 
 On a blocked run, report the reason and next action on the triggering issue
 when permitted, otherwise in the session summary. Do not publish incomplete
