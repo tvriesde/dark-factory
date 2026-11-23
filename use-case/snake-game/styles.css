@@ -181,6 +181,22 @@ h1 { margin: 0; font-size: clamp(38px, 5vw, 55px); line-height: .95; letter-spac
 
 .page-footer { min-height: 58px; border-top: 1px solid var(--line); color: #87907e; font-size: 8px; }
 
+@media (min-width: 761px) and (max-height: 820px) {
+  .masthead { height: 64px; }
+  .game-layout { padding-block: 24px 32px; }
+  .game-column { width: min(100%, 520px, calc(100vh - 420px)); }
+  .game-heading { margin-bottom: 12px; }
+  .game-heading .eyebrow { margin-bottom: 6px; }
+  .screen-frame { padding: 9px 9px 10px; }
+  .screen-topline { height: 18px; }
+  .playfield-wrap { padding: 6px; }
+  .board-caption { padding-top: 6px; }
+  .game-controls { padding-top: 8px; }
+  .game-status { margin-top: 8px; }
+  .direction-pad { margin-top: 8px; }
+  .page-footer { min-height: 48px; }
+}
+
 @media (max-width: 760px) {
   .page-shell { width: min(100% - 36px, 520px); }
   .masthead { height: 66px; }
