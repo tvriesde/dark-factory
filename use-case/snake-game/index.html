@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e9eadb">
+  <title>Snake — Pocket Arcade</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="masthead">
+      <a class="wordmark" href="./" aria-label="Pocket Arcade home">POCKET<span>ARCADE</span></a>
+      <p class="edition">CLASSIC SERIES <span aria-hidden="true">/</span> 01</p>
+    </header>
+
+    <section class="game-layout" aria-labelledby="game-title">
+      <div class="game-column">
+        <div class="game-heading">
+          <div>
+            <p class="eyebrow">A little bit of nostalgia</p>
+            <h1 id="game-title">Snake<span class="heading-dot">.</span></h1>
+          </div>
+          <div class="score-card" aria-label="Current score">
+            <span class="score-label">SCORE</span>
+            <output id="score" class="score-value" aria-live="off">00</output>
+          </div>
+        </div>
+
+        <div class="screen-frame">
+          <div class="screen-topline">
+            <span class="screen-brand">POCKET<span>ARCADE</span></span>
+            <span class="screen-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+          <div class="playfield-wrap">
+            <div id="board" class="board" role="img" aria-label="Snake game board. Ready to play." aria-describedby="game-status"></div>
+            <div class="board-caption" aria-hidden="true"><span>DOT MATRIX DISPLAY</span><span>20 × 20</span></div>
+          </div>
+        </div>
+
+        <div class="game-controls">
+          <div class="action-row">
+            <button id="action-button" class="button button-primary" type="button"><span id="action-label">Start game</span> <span id="action-icon" aria-hidden="true">↗</span></button>
+            <button id="pause-button" class="button button-secondary" type="button" disabled>Pause</button>
+          </div>
+          <div class="direction-pad" aria-label="Touch direction controls">
+            <button class="direction-button direction-up" type="button" data-direction="up" aria-label="Move up"><span aria-hidden="true">↑</span></button>
+            <button class="direction-button direction-left" type="button" data-direction="left" aria-label="Move left"><span aria-hidden="true">←</span></button>
+            <button class="direction-button direction-down" type="button" data-direction="down" aria-label="Move down"><span aria-hidden="true">↓</span></button>
+            <button class="direction-button direction-right" type="button" data-direction="right" aria-label="Move right"><span aria-hidden="true">→</span></button>
+          </div>
+          <p id="game-status" class="game-status" role="status" aria-live="polite">Ready when you are. Use the arrows to guide your snake.</p>
+        </div>
+      </div>
+
+      <aside class="side-notes" aria-labelledby="how-to-title">
+        <div class="note-top">
+          <span class="note-icon" aria-hidden="true">✳</span>
+          <p class="eyebrow">The original time-killer</p>
+        </div>
+        <h2 id="how-to-title">One more<br>round?</h2>
+        <p class="intro">Collect the little dots. Get longer. Try not to meet yourself along the way.</p>
+        <div class="how-to">
+          <h3>HOW TO PLAY</h3>
+          <ul>
+            <li><span class="key-hint" aria-hidden="true">↑ ↓ ← →</span><span>Steer with your arrow keys</span></li>
+            <li><span class="key-hint touch-hint" aria-hidden="true">✣</span><span>Or tap the direction pad</span></li>
+            <li><span class="key-hint" aria-hidden="true">Ⅱ</span><span>Pause whenever you need</span></li>
+          </ul>
+        </div>
+        <p class="side-footnote"><span aria-hidden="true">●</span> NO WIFI. JUST ONE MORE TRY.</p>
+      </aside>
+    </section>
+
+    <footer class="page-footer"><span>MADE FOR THE IN-BETWEEN MOMENTS</span><span>© POCKET ARCADE</span></footer>
+  </main>
+</body>
+</html>
