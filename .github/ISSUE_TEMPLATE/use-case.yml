@@ -1,0 +1,30 @@
+name: HTML use case
+description: Request a new static HTML prototype or a change to an existing one.
+title: "[Use case] "
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: User outcome
+      description: Who is this for, what should they be able to do, and why?
+    validations:
+      required: true
+  - type: input
+    id: existing-case
+    attributes:
+      label: Existing use-case slug
+      description: For an update, enter the existing folder name under use-case/. Leave blank if new or unknown.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected behavior
+      description: Describe the main flow, important edge cases, and any existing behavior to preserve. Use synthetic examples only.
+    validations:
+      required: true
+  - type: checkboxes
+    id: review
+    attributes:
+      label: Optional delivery gates
+      options:
+        - label: Pause for maintainer approval after scope and design review.
+        - label: Require a verified Figma design before implementation.
