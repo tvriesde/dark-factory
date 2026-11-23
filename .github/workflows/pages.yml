@@ -1,14 +1,13 @@
 name: Deploy use cases to Pages
+run-name: ${{ inputs.pull_request && format('Publish Pages for PR #{0}', inputs.pull_request) || 'Publish Pages from main' }}
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'use-case/**'
-      - 'scripts/build_pages.py'
-      - 'scripts/pages-index.html'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
+    inputs:
+      pull_request:
+        description: Merged pull request number (optional for manual deployments)
+        type: string
+        required: false
 
 permissions: {}
 

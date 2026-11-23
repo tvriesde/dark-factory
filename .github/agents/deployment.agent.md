@@ -18,7 +18,7 @@ Do not change source files or commit the generated artifact.
 
 Return `ready` or `blocked`, the verified case route, and evidence. A ready
 verdict means eligible for publication, not live. After Triage opens the PR
-and it lands on `main`, the **Deploy use cases to Pages** workflow publishes
-the site. Do not merge the PR, deploy from a feature branch, or change
+and it lands on `main`, the separate Deployment Publisher run dispatches
+**Deploy use cases to Pages**. Do not merge the PR, deploy from a feature branch, or change
 repository settings. Report any known Pages configuration blocker separately
 from artifact readiness.

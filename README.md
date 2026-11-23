@@ -1,7 +1,7 @@
 # Dark Factory
 
-Eight [Copilot cloud agent profiles](.github/agents) take an issue from intake
-to a static HTML prototype. Results are committed to a feature branch in this
+The [Copilot cloud agent profiles](.github/agents) take an issue from intake
+to a published HTML prototype. Results are committed to a feature branch in this
 repository and delivered in one issue-linked pull request. See
 [`use-case/`](use-case/README.md) for the directory and preview conventions.
 
@@ -14,7 +14,8 @@ repository and delivered in one issue-linked pull request. See
 | Architect | Specifies the files, interactions, technical constraints, and verification approach. |
 | Developer | Creates or updates the HTML and design notes in the selected directory. |
 | Tester | Checks the actual prototype in the browser and reports evidence against the criteria. |
-| Deployment | Verifies the generated Pages catalog and hands off publication to GitHub Actions after the PR lands on `main`. |
+| Deployment | Verifies the generated Pages catalog before the PR opens. |
+| Deployment Publisher | Runs separately after merge and calls the Pages workflow on `main`. |
 
 ## Start from an issue on GitHub
 
@@ -66,11 +67,52 @@ plan supports Pages for private repositories and that GitHub Actions is
 enabled. Check site visibility before publishing: a private repository does
 not automatically make its Pages site private.
 
-For the first deployment, open **Actions > Deploy use cases to Pages** and
-select **Run workflow** on `main`. After that, pushes to `main` that change a
-use case or the Pages build trigger a deployment. The site URL appears on the
-workflow run and in **Settings > Pages**. The site opens at a generated
-`index.html` listing each use case; no manual link update is needed.
+### Enable agent-triggered deployment
+
+1. Make a fine-grained GitHub personal access token for **only this repository**
+   with **Actions: Read and write** and an expiration date. In the repository,
+   open **Settings > Secrets and variables > Agents** and save
+   `COPILOT_MCP_PAGES_ACTIONS_AUTH` with the value `Bearer ` followed by the
+   token. Never paste the token into a prompt or commit it.
+2. In **Settings > Copilot > MCP servers**, add `pages-actions` to the existing
+   `mcpServers` object. Do not replace other MCP entries.
+
+   ```json
+   {
+     "mcpServers": {
+       "pages-actions": {
+         "type": "http",
+         "url": "https://api.githubcopilot.com/mcp/",
+         "headers": {
+           "Authorization": "$COPILOT_MCP_PAGES_ACTIONS_AUTH",
+           "X-MCP-Toolsets": "actions"
+         },
+         "tools": ["actions_run_trigger"]
+       }
+     }
+   }
+   ```
+
+3. Under **Agents > Automations**, create a **shared** automation named
+   **Deploy merged use cases**. Use **When a pull request is merged**, query
+   `base:main`, and path filters `use-case/**`, `.github/workflows/pages.yml`,
+   `scripts/build_pages.py`, and `scripts/pages-index.html`. Require write
+   access and leave Copilot-originated triggers off. Grant **Read PR**,
+   **List workflows** (for run history), and the `pages-actions` tool
+   `actions_run_trigger`. Use this prompt:
+
+   > Read `.github/agents/deployment-publisher.agent.md` and follow it for
+   > the pull request that triggered this run. Verify the merge and changed
+   > paths, dispatch `pages.yml` on `main` once, and record the workflow link
+   > or the reason it was not dispatched.
+
+The Actions tool also supports other operations. Grant it only to the
+post-merge automation, not issue intake, and keep the token repository-scoped.
+The original Deployment agent checks the artifact before merge but has no
+dispatch tool. For the first deployment or a direct-to-`main` change, use
+**Actions > Deploy use cases to Pages > Run workflow** on `main`. The site URL
+appears on the workflow run and in **Settings > Pages**. The site opens at a
+generated `index.html` listing each use case.
 
 ## Connect Figma
 

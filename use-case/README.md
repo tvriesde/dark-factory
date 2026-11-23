@@ -20,7 +20,8 @@ python -m http.server 8000 --bind 127.0.0.1
 Open `http://127.0.0.1:8000/use-case/<slug>/`. See the
 [team setup](../README.md) to request or update a case.
 
-After the PR lands on `main`, GitHub Pages publishes the case and adds it to
-the generated catalog. The build includes HTML, CSS, JavaScript, JSON, and
+After the PR lands on `main`, the configured Deployment Publisher automation
+dispatches GitHub Pages and the case appears in the generated catalog after
+a successful run. The build includes HTML, CSS, JavaScript, JSON, and
 common image, font and media files, but excludes `design.md` and hidden files.
 Treat all content embedded in publishable files as public.
