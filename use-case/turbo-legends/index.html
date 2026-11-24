@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10172b">
+  <title>Turbo Legends</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="content.js"></script>
+  <script defer src="storage.js"></script>
+  <script defer src="audio.js"></script>
+  <script defer src="game.js"></script>
+</head>
+<body>
+  <header class="topbar"><a href="#home" id="brand" aria-label="Turbo Legends home"><span>◆</span> TURBO <em>LEGENDS</em></a><div class="topright"><span id="wallet"></span><button id="settingsLink" class="quiet">Settings</button></div></header>
+  <main>
+    <div id="warning" class="warning" role="status" hidden></div>
+    <div id="status" class="sr-only" aria-live="polite"></div>
+    <section id="home" class="screen">
+      <div class="hero">
+        <div><p class="eyebrow">YOUR ROAD. YOUR LEGEND.</p><h1>Chase the<br><i>extraordinary.</i></h1><p class="lead">Twelve tracks. Four worlds. One finish line worth fighting for.</p><div class="actions"><button id="raceNow" class="primary">Race now <span>→</span></button><button data-page="quick" class="secondary">Choose a race</button></div><p class="hint">Jump straight into Bay Loop · Arrow keys or WASD to drive</p></div>
+        <div class="hero-art" aria-hidden="true"><div class="sun"></div><div class="mountain"></div><div class="road-art"></div><div class="art-car">◆</div><span>01 / COAST</span></div>
+      </div>
+      <div class="section-title"><div><p class="eyebrow">PICK YOUR PATH</p><h2>Make your mark</h2></div><span>OFFLINE RACING CLUB / EST. TODAY</span></div>
+      <nav class="mode-grid" aria-label="Game modes">
+        <button data-page="quick" class="mode"><span class="mode-icon">↗</span><strong>Quick Race</strong><small>Pick a track and hit the road.</small><b>01 / RACE →</b></button>
+        <button data-page="career" class="mode"><span class="mode-icon">✦</span><strong>Career</strong><small>Win championships. Unlock worlds.</small><b>02 / COMPETE →</b></button>
+        <button data-page="trial" class="mode"><span class="mode-icon">◷</span><strong>Time Trial</strong><small>Just you, the road, and the clock.</small><b>03 / CHALLENGE →</b></button>
+        <button data-page="garage" class="mode"><span class="mode-icon">◇</span><strong>Garage</strong><small>Build a ride that’s yours.</small><b>04 / CUSTOMIZE →</b></button>
+      </nav>
+    </section>
+    <section id="setup" class="screen" hidden>
+      <button class="back" data-page="home">← Back to home</button><p class="eyebrow" id="setupKicker"></p><h1 id="setupTitle"></h1><p id="setupDescription" class="lead"></p>
+      <div class="setup-layout"><div><div id="trackList" class="track-list"></div></div><aside class="panel"><p class="eyebrow">RACE DETAILS</p><h2 id="selectedTrack"></h2><p id="trackDetail"></p><label for="difficulty">AI difficulty</label><select id="difficulty"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select><p id="setupNote" class="hint"></p><button id="startRace" class="primary full">Start race →</button></aside></div>
+    </section>
+    <section id="garage" class="screen" hidden>
+      <button class="back" data-page="home">← Back to home</button><p class="eyebrow">THE GARAGE</p><h1>Make it yours.</h1><p class="lead">Buy, tune and style your ride. Appearance changes apply when you save.</p>
+      <div class="garage-layout"><div class="panel"><div class="garage-preview"><canvas id="garageCanvas" width="640" height="360" aria-label="Rotatable car preview"></canvas></div><div class="rotate"><button id="rotateLeft" aria-label="Rotate car left">↶</button><span>ROTATE VIEW</span><button id="rotateRight" aria-label="Rotate car right">↷</button></div><label for="carSelect">Car</label><select id="carSelect"></select><p id="carInfo"></p><button id="buyCar" class="secondary full"></button><button id="useCar" class="primary full">Use this car</button></div>
+        <div class="panel"><div class="tabs"><button id="tuneTab" aria-pressed="true">Performance</button><button id="styleTab" aria-pressed="false">Appearance</button></div><div id="tuning"></div><div id="styling" hidden>
+          <label for="paint">Paint</label><select id="paint"><option value="#f35d45">Coral</option><option value="#27c7bd">Aqua</option><option value="#f4c85b">Gold</option><option value="#d9e3f2">Pearl</option><option value="#815ae5">Violet</option></select>
+          <label for="wheels">Wheels</label><select id="wheels"><option>Classic</option><option>Sport</option><option>Gold</option></select>
+          <label for="stripes">Stripes</label><select id="stripes"><option>None</option><option>Center</option><option>Twin</option></select>
+          <label for="spoiler">Spoiler</label><select id="spoiler"><option>None</option><option>Sport</option><option>Wing</option></select>
+          <label for="body">Body</label><select id="body"><option>Standard</option><option>Wide</option><option>Aero</option></select>
+          <button id="applyStyle" class="primary full">Apply appearance</button><p class="hint">Changes are a draft until applied.</p></div></div></div>
+    </section>
+    <section id="settings" class="screen" hidden><button id="settingsBack" class="back">← Back</button><p class="eyebrow">MAKE IT YOURS</p><h1>Settings</h1><div class="panel settings-panel"><label for="musicVolume">Music volume</label><input id="musicVolume" type="range" min="0" max="1" step=".1"><label class="check"><input id="musicMute" type="checkbox"> Mute music</label><label for="effectsVolume">Effects volume</label><input id="effectsVolume" type="range" min="0" max="1" step=".1"><label class="check"><input id="effectsMute" type="checkbox"> Mute effects</label><label class="check"><input id="reduceMotion" type="checkbox"> Reduce visual motion</label><button id="resetData" class="danger">Reset saved progress</button></div></section>
+    <section id="race" class="race-screen" hidden aria-label="Race">
+      <canvas id="raceCanvas" aria-label="Race view"></canvas>
+      <div class="race-top"><div><span class="hud-label">POSITION</span><strong id="hudPosition"></strong></div><div><span class="hud-label">LAP</span><strong id="hudLap"></strong></div><div><span class="hud-label">TIME</span><strong id="hudTime"></strong></div><button id="pauseButton" aria-label="Pause race">Ⅱ</button></div>
+      <div class="race-bottom"><div><span class="hud-label">SPEED</span><strong id="hudSpeed"></strong><small> KM/H</small><div class="nitro-label">NITRO <span id="hudNitroText"></span></div><div class="bar"><span id="hudNitro"></span></div></div><div class="race-side"><canvas id="minimap" width="160" height="120" aria-label="Track minimap"></canvas><ol id="standings" aria-label="Race positions"></ol></div></div>
+      <div id="raceMessage" class="race-message"></div>
+      <div class="touch-controls" aria-label="Touch driving controls"><div><button data-key="left" aria-label="Steer left">◀</button><button data-key="right" aria-label="Steer right">▶</button></div><div><button data-key="drift">DRIFT</button><button data-key="nitro">NITRO</button><button data-key="brake">BRAKE</button><button data-key="accelerate">GO</button></div></div>
+    </section>
+    <section id="results" class="screen" hidden><p class="eyebrow">RACE COMPLETE</p><h1 id="resultTitle"></h1><p id="resultSummary" class="lead"></p><div class="results-layout"><div class="panel"><h2>Standings</h2><ol id="resultList" class="results-list"></ol></div><div class="panel"><p class="eyebrow">YOUR REWARDS</p><h2 id="resultCash"></h2><div id="rewardDetail"></div><p id="unlockDetail"></p><div class="actions"><button id="resultContinue" class="primary">Continue →</button><button data-page="home" class="secondary">Home</button></div></div></div></section>
+  </main>
+  <div id="modal" class="modal" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><p class="eyebrow" id="modalKicker"></p><h2 id="modalTitle"></h2><p id="modalText"></p><div id="modalActions" class="dialog-actions"></div></div></div>
+  <footer id="footer"><span>◆ TURBO LEGENDS</span><span>BUILT FOR THE LONG WAY ROUND.</span></footer>
+</body>
+</html>
