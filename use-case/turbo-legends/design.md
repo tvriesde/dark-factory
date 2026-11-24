@@ -173,3 +173,8 @@ Narrow screens stack standings above the money breakdown. Money is paid once. A 
   - Career keeps `championship` and runs Coast → Alps → Night City → Desert. Winning a world's career championship unlocks the next world.
   - Old saves load intact; `cup:null` is added when missing.
 - **Naming:** the world label "Neon City" is now "Night City". Track ids, names and order are unchanged.
+
+## Fix cycle (issue #14, Tester follow-up)
+- **Narrow HUD (≤ 800px):** row 1 holds Position, Lap, Time and Pause at a fixed 54px height. Row 2 (8px gap) holds the objective chip on the left (one line, ellipsis) and a single-column standings plate on the right (128px wide). The plate shows the top 3 plus YOU, with true positions (e.g. `5. YOU`). Plates no longer touch or overlap. The inline `<style>` block in `index.html` has moved into `styles.css`.
+- **Separate controls zone (≤ 800px or `pointer:coarse`):** pads sit in a 76px bar below the canvas. The canvas fills the area above, and its backing size follows its box, so the road, AI cars and player car stay uncovered and in the right place. The speed/map HUD sits just above the bar. Desktop with a mouse is unchanged.
+- **Nitro objective:** a press counts as one use only after the burst has boosted for 0.4s (`NITRO_USE_TIME`, ≈10 nitro units). One long hold counts once, and quick taps don't count.

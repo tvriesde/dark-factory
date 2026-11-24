@@ -171,7 +171,7 @@ function startRace(){
   resultProcessed=false;paused=false;keys={};showPage("race");resizeCanvas();lastFrame=performance.now();accumulator=0;$("pauseButton").focus();
   announce(TRACKS[selectedTrack].name+". Race starting. Arrow keys or WASD drive, Space drifts, Shift fires nitro, Escape pauses.");saveData();
 }
-function resizeCanvas(){let ratio=Math.min(devicePixelRatio||1,1.5);if(innerWidth*ratio>1600)ratio=1600/innerWidth;canvas.width=Math.max(320,Math.floor(innerWidth*ratio));canvas.height=Math.max(240,Math.floor(innerHeight*ratio))}
+function resizeCanvas(){const w=canvas.clientWidth||innerWidth,h=canvas.clientHeight||innerHeight;let ratio=Math.min(devicePixelRatio||1,1.5);if(w*ratio>1600)ratio=1600/w;canvas.width=Math.max(320,Math.floor(w*ratio));canvas.height=Math.max(240,Math.floor(h*ratio))}
 window.addEventListener("resize",()=>{if(page==="race")resizeCanvas()});
 const keyMap={ArrowUp:"accelerate",w:"accelerate",ArrowDown:"brake",s:"brake",ArrowLeft:"left",a:"left",ArrowRight:"right",d:"right"," ":"drift",Shift:"nitro"};
 window.addEventListener("keydown",e=>{
@@ -239,7 +239,7 @@ function updateHud(dt){
   if(hudCache.objHidden!==!st){hudCache.objHidden=!st;chip.hidden=!st}
   if(st){setHud("hudObjective",st.text);if(hudCache.objState!==st.state){hudCache.objState=st.state;chip.className="objective-chip "+st.state}}
   const list=$("standings"),order=r.order.length?r.order:r.cars,entries=order.map(a=>(a===p?"YOU":a.name)+(a.finished?" ✓":"")),signature=entries.join("|");
-  if(list.dataset.signature!==signature){list.replaceChildren();entries.forEach((text,i)=>{const li=document.createElement("li");li.textContent=text;if(order[i]===p)li.className="me";list.append(li)});list.dataset.signature=signature}
+  if(list.dataset.signature!==signature){list.replaceChildren();entries.forEach((text,i)=>{const li=document.createElement("li");li.textContent=text;li.value=i+1;if(order[i]===p)li.className="me";else if(i>=3)li.className="extra";list.append(li)});list.dataset.signature=signature}
   summaryTimer-=dt;if(summaryTimer<=0){summaryTimer=1;$("raceSummary").textContent=r.track.def.name+": "+(solo?"time trial":"position "+pos+" of 8")+", lap "+Math.max(1,Math.min(p.lap+1,r.laps))+" of "+r.laps+", "+Math.round(p.speed*.025)+" km/h, nitro "+pct+"%"+(p.offroad?", off the road":"")+(st?", objective "+st.text.replace("★ ",""):"")+"."}
 }
 function timeText(seconds){const m=Math.floor(seconds/60),s=(seconds%60).toFixed(2).padStart(5,"0");return m+":"+s}

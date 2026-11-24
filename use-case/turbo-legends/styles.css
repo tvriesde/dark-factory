@@ -17,5 +17,24 @@
 .reward-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line)}
 #standings li.me{color:var(--accent);font-weight:900}
 @media(max-width:1100px){.mode-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:800px){.mode-grid{grid-template-columns:repeat(2,1fr)}.objective-chip{font-size:.65rem}.race-top>.objective-chip{position:fixed;top:64px;left:2%;max-width:calc(96% - 130px);padding:6px 8px}}
+@media(max-width:800px){.mode-grid{grid-template-columns:repeat(2,1fr)}.objective-chip{font-size:.65rem}}
+/* Touch/narrow race layout: the canvas fills the area above a separate controls zone, so pads never cover the road. */
+@media(max-width:800px),(pointer:coarse){
+  .race-screen{--ctl:76px}
+  #raceCanvas{height:calc(100% - var(--ctl))}
+  .touch-controls{top:auto;bottom:0;left:0;right:0;height:var(--ctl);align-items:center;padding:0 2%;background:#0b1220;border-top:1px solid #ffffff24}
+  .touch-controls>div{align-items:center}
+  .touch-controls button{min-width:52px;height:56px}
+  .race-bottom{bottom:calc(var(--ctl) + 8px)}
+}
+/* Narrow HUD: row 1 = position/lap/time/pause; row 2 = objective chip (left) and top 3 + YOU (right). */
+@media(max-width:800px){
+  .race-top{top:10px;display:grid;grid-template-columns:auto auto auto 1fr auto;column-gap:6px;row-gap:8px;align-items:stretch}
+  .race-top>div:not(.objective-chip),.race-top>button{height:54px}
+  .race-top>button{grid-column:5;grid-row:1;margin-left:0}
+  .race-top>.objective-chip{grid-row:2;grid-column:1/5;justify-self:start;max-width:calc(100% - 140px);padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .race-side ol{display:block;position:fixed;top:72px;right:2%;width:128px;margin:0;padding:6px 8px;list-style-position:inside;border:1px solid #ffffff24;border-radius:4px;background:#111c2cdb;font-size:.72rem;line-height:1.35}
+  .race-side ol li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #standings li.extra{display:none}
+}
 @media(prefers-reduced-motion:reduce){.bar.empty{animation:none}}

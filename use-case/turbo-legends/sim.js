@@ -1,13 +1,13 @@
 "use strict";
 // Shared car model for the player and AI. Fixed 1/60 s steps; no DOM access.
-const STEP=1/60, REF=10000, CAR_W=.24, CAR_LEN=360, CENTRIFUGAL=.5, STEER_RATE=2.1;
+const STEP=1/60, REF=10000, CAR_W=.24, CAR_LEN=360, CENTRIFUGAL=.5, STEER_RATE=2.1, NITRO_USE_TIME=.4;
 function carStats(carIndex,up){
   const car=CARS[carIndex],u=k=>up[k]||0;
   return {top:REF*car.speed*(1+.04*u("turbo")+.015*u("engine")),accel:car.accel*(1+.08*u("engine")+.03*u("turbo")),
     brake:car.brake*(1+.1*u("brakes")),grip:car.grip*(1+.07*u("tires")),susp:1+.08*u("suspension"),maxNitro:100*(1+.2*u("nitro"))};
 }
 function newCar(id,name,stats,z,x,lap){
-  return {id,name,z,x,lap,speed:0,stats,nitro:stats.maxNitro,maxNitro:stats.maxNitro,nitroActive:false,nitroHeld:false,nitroUses:0,
+  return {id,name,z,x,lap,speed:0,stats,nitro:stats.maxNitro,maxNitro:stats.maxNitro,nitroActive:false,nitroHeld:false,nitroUses:0,nitroBurst:0,nitroCounted:false,
     drift:0,drifting:false,driftTime:0,steer:0,wallHits:0,hitCool:0,offroad:false,finished:false,finishTime:null,ai:null,yaw:0};
 }
 function wrapDelta(d,L){d%=L;if(d>L/2)d-=L;if(d<-L/2)d+=L;return d}
@@ -66,11 +66,13 @@ function stepCar(car,inp,race,dt){
   const t=race.track,L=t.length,st=car.stats,seg=segAt(t,car.z),sp=car.speed/REF;
   car.hitCool=Math.max(0,car.hitCool-dt);
   car.offroad=Math.abs(car.x)>1;
-  // Nitro: each new press that fires counts as a use; cannot fire when empty.
+  // Nitro: a burst counts as one use only after it has boosted for NITRO_USE_TIME seconds
+  // (≈10% of base capacity), so quick taps cannot game the objective; cannot fire when empty.
   const edge=inp.nitro&&!car.nitroHeld;car.nitroHeld=!!inp.nitro;
   if(edge&&car.nitro<=0.5)race.events.push({type:"nitroEmpty",car});
   const canNitro=inp.nitro&&car.nitro>0&&car.speed>st.top*.15&&(car.nitroActive||edge&&car.nitro>.5);
-  if(canNitro&&!car.nitroActive){car.nitroUses++;race.events.push({type:"nitro",car})}
+  if(canNitro&&!car.nitroActive){car.nitroBurst=0;car.nitroCounted=false;race.events.push({type:"nitro",car})}
+  if(canNitro){car.nitroBurst=(car.nitroBurst||0)+dt;if(!car.nitroCounted&&car.nitroBurst>=NITRO_USE_TIME){car.nitroCounted=true;car.nitroUses++}}
   car.nitroActive=canNitro;
   let limit=st.top;
   if(car.nitroActive){limit*=1.25;car.nitro=Math.max(0,car.nitro-26*dt)}else car.nitro=Math.min(car.maxNitro,car.nitro+2.5*dt);
