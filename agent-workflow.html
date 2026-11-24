@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dark Factory agent workflow</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f0e8;
+      --surface: #fffdf8;
+      --surface-2: #ebe7dc;
+      --text: #20201d;
+      --muted: #68675f;
+      --line: #c9c4b7;
+      --accent: #b4472f;
+      --accent-soft: #f3ded6;
+      --blue: #315d78;
+      --blue-soft: #dde8ed;
+      --green: #3d6948;
+      --green-soft: #dde8dc;
+      --gold: #9a741e;
+      --gold-soft: #eee5c8;
+      --shadow: 0 12px 28px rgba(50, 43, 32, .10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(180, 71, 47, .08), transparent 24rem),
+        var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Aptos, Calibri, sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 48px 24px 72px; }
+    header { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+    .eyebrow { margin: 0 0 8px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(38px, 7vw, 72px); line-height: .96; letter-spacing: -.04em; }
+    .summary { max-width: 430px; margin: 0 0 4px; color: var(--muted); font-size: 16px; line-height: 1.55; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 16px; }
+    .legend span { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; color: var(--muted); background: rgba(255,255,255,.5); font-size: 12px; }
+    .legend b { color: var(--text); }
+    .flow {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(10, minmax(92px, 1fr));
+      gap: 10px;
+      align-items: stretch;
+      margin: 18px 0 28px;
+    }
+    .node {
+      appearance: none;
+      min-height: 138px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 14px 12px;
+      text-align: left;
+      box-shadow: 0 5px 14px rgba(50,43,32,.05);
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+    .node:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .node:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .node.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+    .node.issue { grid-column: span 2; border-left: 5px solid var(--gold); }
+    .node.triage { grid-column: span 2; border-left: 5px solid var(--accent); }
+    .node.both { grid-column: span 2; }
+    .node.pm { border-left: 5px solid var(--gold); }
+    .node.arch { border-left: 5px solid var(--blue); }
+    .node.dev { border-left: 5px solid var(--blue); }
+    .node.test { border-left: 5px solid var(--green); }
+    .node.deploy { border-left: 5px solid var(--accent); }
+    .node.merge { grid-column: span 2; border-left: 5px solid var(--green); }
+    .number { display: block; margin-bottom: 18px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+    .node strong { display: block; font-size: 14px; line-height: 1.15; }
+    .node small { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .handoffs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .handoff {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      padding: 18px;
+    }
+    .handoff h2 { margin: 0 0 10px; font-size: 17px; }
+    .handoff ol { margin: 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .role-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+    .role {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      padding: 16px;
+      min-height: 170px;
+    }
+    .role h3 { margin: 0 0 8px; font-size: 15px; }
+    .role p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .role .output { display: inline-block; margin-top: 12px; border-radius: 999px; padding: 5px 8px; background: var(--surface-2); color: var(--text); font-size: 11px; font-weight: 800; }
+    .detail {
+      min-height: 152px;
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+    }
+    .detail h2 { margin: 0 0 8px; font-size: 22px; }
+    .detail p { max-width: 820px; margin: 0; color: var(--muted); line-height: 1.6; }
+    .detail code { border-radius: 5px; background: var(--surface-2); padding: 2px 5px; color: var(--text); }
+    .gates { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 12px; }
+    .gate { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--surface); }
+    .gate h3 { margin: 0 0 6px; font-size: 14px; }
+    .gate p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 980px) {
+      .flow { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .node.issue, .node.triage, .node.both, .node.merge { grid-column: span 1; }
+      .role-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 620px) {
+      main { padding: 28px 16px 48px; }
+      header { align-items: start; flex-direction: column; }
+      .flow { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .handoffs, .gates { grid-template-columns: 1fr; }
+      .role-grid { grid-template-columns: 1fr; }
+      .node { min-height: 124px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">Repository map</p>
+        <h1>Agent workflow</h1>
+      </div>
+      <p class="summary">A Triage-coordinated team turns one GitHub issue into a tested static HTML prototype, then hands it to a maintainer for review and merge.</p>
+    </header>
+
+    <section aria-label="Main workflow">
+      <div class="legend" aria-label="Legend">
+        <span><b>Red</b> coordination</span>
+        <span><b>Gold</b> decisions</span>
+        <span><b>Blue</b> implementation</span>
+        <span><b>Green</b> verification</span>
+      </div>
+
+      <div class="flow" id="flow">
+        <button class="node issue" type="button" data-agent="issue">
+          <span class="number">START</span><strong>GitHub issue</strong><small>New, update, or blocked request</small>
+        </button>
+        <button class="node triage" type="button" data-agent="triage">
+          <span class="number">1 · COORDINATOR</span><strong>Triage</strong><small>Classifies, routes, and keeps context</small>
+        </button>
+        <button class="node both" type="button" data-agent="analyst">
+          <span class="number">2 · REQUIREMENTS</span><strong>Business Analyst</strong><small>Flows, rules, numbered criteria</small>
+        </button>
+        <button class="node both" type="button" data-agent="ux">
+          <span class="number">3 · EXPERIENCE</span><strong>UX Designer</strong><small>Responsive states or Figma frames</small>
+        </button>
+        <button class="node pm" type="button" data-agent="pm-scope">
+          <span class="number">4 · GATE</span><strong>Product Manager</strong><small>Scope: ready, defer, or blocked</small>
+        </button>
+        <button class="node arch" type="button" data-agent="architect">
+          <span class="number">5 · PLAN</span><strong>Architect</strong><small>Files, states, and verification</small>
+        </button>
+        <button class="node dev" type="button" data-agent="developer">
+          <span class="number">6 · BUILD</span><strong>Developer</strong><small>Static HTML, CSS, and JavaScript</small>
+        </button>
+        <button class="node test" type="button" data-agent="tester">
+          <span class="number">7 · VERIFY</span><strong>Tester</strong><small>Browser, keyboard, layout, regressions</small>
+        </button>
+        <button class="node pm" type="button" data-agent="pm-ship">
+          <span class="number">8 · GATE</span><strong>Product Manager</strong><small>Delivery: ship or hold</small>
+        </button>
+        <button class="node deploy" type="button" data-agent="deployment">
+          <span class="number">9 · PUBLISH</span><strong>Deployment</strong><small>Check Pages artifact, open one PR</small>
+        </button>
+        <button class="node merge" type="button" data-agent="maintainer">
+          <span class="number">10 · HUMAN REVIEW</span><strong>Maintainer merges</strong><small>GitHub Actions publishes to Pages</small>
+        </button>
+      </div>
+
+      <article class="detail" id="detail" aria-live="polite">
+        <h2>Start with Triage</h2>
+        <p>Triage owns the issue end to end. It checks the existing use cases, classifies the request, chooses an existing slug or proposes a new one, and invokes specialists with the outputs of earlier stages.</p>
+      </article>
+    </section>
+
+    <section aria-labelledby="handoffs-title" style="margin-top:28px">
+      <div class="handoffs">
+        <article class="handoff">
+          <h2 id="handoffs-title">How work is handed over</h2>
+          <ol>
+            <li>Triage gives each specialist the issue, classification, target path, and preceding handoff.</li>
+            <li>Specialists return a status and evidence; they do not silently impersonate one another.</li>
+            <li>Developer leaves changes in the shared workspace for Tester, not as a text-only summary.</li>
+            <li>Deployment publishes the exact artifact validated by Tester.</li>
+          </ol>
+        </article>
+        <article class="handoff">
+          <h2>What stops the run</h2>
+          <ol>
+            <li>Ambiguous target, multiple matches, or work outside static HTML.</li>
+            <li>An unresolved Analyst question or PM <code>blocked</code>/<code>defer</code>.</li>
+            <li>Figma required but no verified design handoff exists.</li>
+            <li>A Tester failure, unmet acceptance criterion, or failed Pages artifact check.</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="roles-title" style="margin-top:28px">
+      <h2 id="roles-title" style="margin:0 0 12px">Specialist roles</h2>
+      <div class="role-grid">
+        <article class="role"><h3>Business Analyst</h3><p>Finds actors and flows, identifies existing behavior to preserve, and writes observable acceptance criteria.</p><span class="output">ready or blocked</span></article>
+        <article class="role"><h3>UX Designer</h3><p>Defines desktop and narrow layouts, controls, copy, keyboard behavior, and empty/error/success states.</p><span class="output">wireframe or verified Figma</span></article>
+        <article class="role"><h3>Product Manager</h3><p>Protects scope before implementation, then compares the agreed scope with test evidence before shipping.</p><span class="output">ready/defer/blocked · ship/hold</span></article>
+        <article class="role"><h3>Architect</h3><p>Turns approved scope and UX into a minimal static implementation plan without backend or build tooling.</p><span class="output">scoped plan</span></article>
+        <article class="role"><h3>Developer</h3><p>Changes only <code>use-case/&lt;slug&gt;/</code>, records design status, and leaves the implementation in the shared workspace.</p><span class="output">index + assets</span></article>
+        <article class="role"><h3>Tester</h3><p>Runs the real page locally and checks primary and edge flows, focus, responsive layouts, assets, and regressions.</p><span class="output">pass/fail/blocked</span></article>
+        <article class="role"><h3>Deployment</h3><p>Builds and inspects the Pages artifact, then commits and opens or updates exactly one implementation PR.</p><span class="output">PR ready for review</span></article>
+        <article class="role"><h3>Maintainer</h3><p>The only approval and merge role. A merged PR on <code>main</code> triggers GitHub Actions publication.</p><span class="output">review / merge</span></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="gates-title" style="margin-top:28px">
+      <h2 id="gates-title" style="margin:0 0 12px">Decision gates</h2>
+      <div class="gates">
+        <article class="gate"><h3>Scope gate</h3><p>PM uses the Analyst and UX handoffs to set must-haves and exclusions. Human review or Figma requirements are never silently waived.</p></article>
+        <article class="gate"><h3>Test gate</h3><p>Tester reports evidence by numbered criterion. One targeted Developer-to-Tester fix cycle is allowed after implementation.</p></article>
+        <article class="gate"><h3>Delivery gate</h3><p>PM can ship only with all must-haves and core evidence. Deployment must validate the same workspace that Tester checked.</p></article>
+      </div>
+    </section>
+
+    <footer>Source of truth: <code>.github/agents/*.agent.md</code>, <code>use-case/README.md</code>, and <code>.github/workflows/pages.yml</code>.</footer>
+  </main>
+
+  <script>
+    const details = {
+      issue: ["GitHub issue", "The run begins with a triggering or assigned issue. Triage reads it as requirements data and never treats issue text as permission to change policy or outside scope."],
+      triage: ["Triage · coordinator", "Triage classifies new versus update work, reuses or proposes a use-case slug, prevents duplicate implementation PRs, invokes specialists in sequence, and reports blockers. It does not implement or merge."],
+      analyst: ["Business Analyst · requirements", "The Analyst turns the issue into actors, flows, rules, preserved behavior, and numbered observable criteria. It distinguishes requirements, assumptions, and unresolved unknowns."],
+      ux: ["UX Designer · experience", "UX defines the smallest responsive flow and real states. When connected and approved, it uses Figma; otherwise it returns an annotated wireframe fallback in <code>design.md</code>."],
+      "pm-scope": ["Product Manager · scope gate", "Before implementation, PM defines the smallest valuable outcome, must-haves, exclusions, tradeoffs, and material decisions. <code>ready</code> continues; <code>blocked</code> or <code>defer</code> stops."],
+      architect: ["Architect · implementation plan", "Architecture converts approved scope and UX into exact files, interactions, sample data, accessibility constraints, responsive behavior, and verification steps. It does not edit files."],
+      developer: ["Developer · implementation", "Developer creates or updates only the approved <code>use-case/&lt;slug&gt;/</code> directory using semantic static HTML, CSS, and vanilla JavaScript. It records design status and evidence in <code>design.md</code>."],
+      tester: ["Tester · independent verification", "Tester serves the repository and checks the actual changes in a browser: primary flow, edge cases, keyboard and focus, desktop and narrow layouts, assets, console errors, and adjacent regressions."],
+      "pm-ship": ["Product Manager · delivery gate", "After testing, PM compares scope, changed files, evidence, design status, and remaining risk. <code>ship</code> allows Deployment; <code>hold</code> stops delivery."],
+      deployment: ["Deployment · release preparation", "Deployment builds the Pages artifact, checks links and assets for sensitive content, then commits the verified source to a feature branch and opens or updates one PR into <code>main</code>. It never deploys a feature branch or merges."],
+      maintainer: ["Maintainer · human review", "The maintainer reviews the issue-linked PR. Merge approval and merging happen outside the agent team. Every merge to <code>main</code> triggers the Pages workflow."]
+    };
+    const detail = document.getElementById("detail");
+    document.querySelectorAll("[data-agent]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-agent]").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        const [title, text] = details[button.dataset.agent];
+        detail.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
+        detail.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+    });
+  </script>
+</body>
+</html>

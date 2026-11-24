@@ -16,6 +16,13 @@ repository and delivered in one issue-linked pull request. See
 | Tester | Checks the actual prototype in the browser and reports evidence against the criteria. |
 | Deployment | Verifies the generated Pages catalog and opens the PR into `main` for maintainer review. |
 
+## Visualize the agent team
+
+Open [`agent-workflow.html`](agent-workflow.html) for an interactive map of the
+eight agent profiles, their handoffs, and the scope/test/delivery gates. After a
+merge to `main`, the Pages catalog also links to the visualization at
+`agent-workflow.html`.
+
 ## Start from an issue on GitHub
 
 Land the profiles on the default branch. Create an issue using the **HTML use
