@@ -6,6 +6,27 @@
   <meta name="theme-color" content="#10172b">
   <title>Turbo Legends</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Keep all positions readable without covering the touch controls. */
+    @media (max-width:800px) {
+      .race-side ol {
+        display:grid;
+        grid-auto-flow:column;
+        grid-template-rows:repeat(4,auto);
+        column-gap:1rem;
+        position:fixed;
+        top:64px;
+        right:2%;
+        margin:0;
+        padding:6px 10px 6px 1.8rem;
+        border:1px solid #ffffff24;
+        border-radius:4px;
+        background:#111c2cdb;
+        font-size:.72rem;
+        line-height:1.3;
+      }
+    }
+  </style>
   <script defer src="content.js"></script>
   <script defer src="storage.js"></script>
   <script defer src="audio.js"></script>
@@ -52,7 +73,7 @@
       <div id="raceMessage" class="race-message"></div>
       <div class="touch-controls" aria-label="Touch driving controls"><div><button data-key="left" aria-label="Steer left">◀</button><button data-key="right" aria-label="Steer right">▶</button></div><div><button data-key="drift">DRIFT</button><button data-key="nitro">NITRO</button><button data-key="brake">BRAKE</button><button data-key="accelerate">GO</button></div></div>
     </section>
-    <section id="results" class="screen" hidden><p class="eyebrow">RACE COMPLETE</p><h1 id="resultTitle"></h1><p id="resultSummary" class="lead"></p><div class="results-layout"><div class="panel"><h2>Standings</h2><ol id="resultList" class="results-list"></ol></div><div class="panel"><p class="eyebrow">YOUR REWARDS</p><h2 id="resultCash"></h2><div id="rewardDetail"></div><p id="unlockDetail"></p><div class="actions"><button id="resultContinue" class="primary">Continue →</button><button data-page="home" class="secondary">Home</button></div></div></div></section>
+    <section id="results" class="screen" hidden><p class="eyebrow" id="resultKicker">RACE COMPLETE</p><h1 id="resultTitle"></h1><p id="resultSummary" class="lead"></p><div class="results-layout"><div class="panel"><h2 id="resultListTitle">Standings</h2><ol id="resultList" class="results-list"></ol></div><div class="panel"><p class="eyebrow">YOUR REWARDS</p><h2 id="resultCash"></h2><div id="rewardDetail"></div><p id="unlockDetail"></p><div class="actions"><button id="resultContinue" class="primary">Continue →</button><button data-page="home" class="secondary">Home</button></div></div></div></section>
   </main>
   <div id="modal" class="modal" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><p class="eyebrow" id="modalKicker"></p><h2 id="modalTitle"></h2><p id="modalText"></p><div id="modalActions" class="dialog-actions"></div></div></div>
   <footer id="footer"><span>◆ TURBO LEGENDS</span><span>BUILT FOR THE LONG WAY ROUND.</span></footer>

@@ -189,10 +189,10 @@ function rankCars(){return [race.player,...race.rivals].sort((a,b)=>a.finished&&
 function timeText(seconds){const m=Math.floor(seconds/60),s=(seconds%60).toFixed(2).padStart(5,"0");return m+":"+s}
 function finishRace(){
   if(resultProcessed)return;resultProcessed=true;engineSound(0,false);tone(880,.5,"triangle",.15);
-  const r=race,rank=rankCars(),position=rank.findIndex(x=>x.id===0)+1,key=r.track.id+":"+data.selected,previous=data.bests[key],pb=!!previous&&r.time<previous;
+  const r=race,solo=r.mode==="trial",rank=rankCars(),position=rank.findIndex(x=>x.id===0)+1,key=r.track.id+":"+data.selected,previous=data.bests[key],pb=!!previous&&r.time<previous;
   if(!previous||r.time<previous)data.bests[key]=r.time;
-  const posReward=[700,600,400,300,250,200,150,100][position-1],objective=position<=3;
-  const total=100+posReward+(position===1?200:0)+(pb?100:0)+(objective?100:0);data.cash+=total;
+  const posReward=solo?0:[700,600,400,300,250,200,150,100][position-1],win=!solo&&position===1,objective=!solo&&position<=3;
+  const total=100+posReward+(win?200:0)+(pb?100:0)+(objective?100:0);data.cash+=total;
   let unlock="";
   if(r.track.id%3<2&&!data.tracks.includes(r.track.id+1)){data.tracks.push(r.track.id+1);unlock="Unlocked "+TRACKS[r.track.id+1].name+". "}
   if(r.mode==="career"){
@@ -204,14 +204,16 @@ function finishRace(){
       data.championship=null;
     }else{champ.round++;unlock+="Championship round "+(champ.round+1)+" is ready. Your points: "+champ.points[0]+"."}
   }
-  saveData();$("resultTitle").textContent=position===1?"Victory looks good on you.":"Across the finish line.";
+  saveData();$("resultKicker").textContent=solo?"TIME TRIAL COMPLETE":"RACE COMPLETE";
+  $("resultTitle").textContent=solo?"Time trial complete.":win?"Victory looks good on you.":"Across the finish line.";
+  $("resultListTitle").textContent=solo?"Your time":"Standings";
   $("resultSummary").textContent=r.track.name+" · "+timeText(r.time)+" · "+(previous?(pb?"New personal best!":"Best "+timeText(previous)):"First personal best established.");
   $("resultCash").textContent="+$"+total;
-  $("rewardDetail").textContent="Completion $100 · Position $"+posReward+(position===1?" · Win $200":"")+(pb?" · Personal best $100":"")+(objective?" · Top 3 objective $100":"");
+  $("rewardDetail").textContent="Completion $100"+(solo?"":" · Position $"+posReward)+(win?" · Win $200":"")+(pb?" · Personal best $100":"")+(objective?" · Top 3 objective $100":"");
   $("unlockDetail").textContent=unlock||"Complete the next race to keep progressing.";
-  const list=$("resultList");list.replaceChildren();rank.forEach((driver,i)=>{const li=document.createElement("li"),name=document.createElement("strong"),time=document.createElement("span");name.textContent=(i+1)+". "+driver.name;time.textContent=(driver.finished?timeText(driver.finishTime):"On track")+(r.mode==="career"?" · "+POINTS[i]+" pts":"");li.append(name,time);list.append(li)});
+  const list=$("resultList");list.replaceChildren();rank.forEach((driver,i)=>{const li=document.createElement("li"),name=document.createElement("strong"),time=document.createElement("span");name.textContent=(solo?"":(i+1)+". ")+driver.name;time.textContent=(driver.finished?timeText(driver.finishTime):"On track")+(r.mode==="career"?" · "+POINTS[i]+" pts":"");li.append(name,time);list.append(li)});
   $("resultContinue").textContent=r.mode==="career"&&data.championship?"Next round →":"Race again →";
-  showPage("results");$("resultContinue").focus();announce("Race complete. Position "+position+". Reward "+total+" dollars.");
+  showPage("results");$("resultContinue").focus();announce(solo?"Time trial complete. Time "+timeText(r.time)+". Reward "+total+" dollars.":"Race complete. Position "+position+". Reward "+total+" dollars.");
 }
 $("resultContinue").addEventListener("click",()=>{if(race?.mode==="career"&&data.championship)setup("career");else setup(race?.mode||"quick")});
 
@@ -264,7 +266,8 @@ function renderRace(){
   $("hudSpeed").textContent=Math.round(p.speed*2);
   $("hudNitroText").textContent=Math.round(p.nitro/p.maxNitro*100)+"%";$("hudNitro").style.width=(p.nitro/p.maxNitro*100)+"%";
   $("raceMessage").textContent=r.countdown>0?Math.ceil(r.countdown):r.elapsed<4?"GO!":"";
-  const list=$("standings");list.replaceChildren();rankCars().forEach(a=>{const li=document.createElement("li");li.textContent=a.name+(a.finished?" ✓":"");list.append(li)});
+  const list=$("standings"),entries=rankCars().map(a=>a.name+(a.finished?" (finished)":"")),signature=JSON.stringify(entries);
+  if(list.dataset.signature!==signature){list.replaceChildren();entries.forEach(text=>{const li=document.createElement("li");li.textContent=text;list.append(li)});list.dataset.signature=signature}
   renderMinimap();
 }
 function drawRaceCar(c,x,y,size,color,style){

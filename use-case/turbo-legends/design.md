@@ -53,7 +53,7 @@ championship setup, solo time trial, or a garage. Locked tracks state why.
 └─────────────────────────────┘
 ┌─ POS ─ LAP ─ TIME ─ [Ⅱ] ───┐
 │      road / chase car       │
-│                             │
+│             [ positions ]   │
 │ [◀][▶]   [DRIFT][NITRO]    │
 │          [BRAKE][GO]        │
 │ speed / nitro       minimap │
@@ -63,9 +63,9 @@ championship setup, solo time trial, or a garage. Locked tracks state why.
 ## Key interaction states
 
 - Setup: unlocked tracks select; locked tracks explain completion or championship prerequisites. Career resumes the saved round.
-- Race: countdown, HUD and minimap; simultaneous touch holds or keyboard driving. Tab and Escape pause.
+- Race: countdown, HUD and minimap; narrow screens retain a compact two-column positions list above the touch controls. Simultaneous touch holds or keyboard driving. Tab and Escape pause.
 - Pause: freezes simulation; resume restores focus; settings returns to pause; restart and exit require confirmation.
 - Garage: preview rotates; purchases and upgrades check ownership, balance and maximum level. Appearance is a draft until Apply.
-- Results: finishers have times, other drivers are explicitly marked on track; reward breakdown, best, points and unlocks are shown. A result is paid once.
+- Results: finishers have times, other drivers are explicitly marked on track; reward breakdown, best, points and unlocks are shown. A result is paid once. Solo time trials show a time rather than a placing, and award completion plus any established personal-best bonus, not competitive bonuses or points.
 - Settings: independent synthesized music/effects levels and mute, reduced motion, and confirmed progress reset.
 - Storage failure: persistent warning, session-only play; invalid stored data is not overwritten without reset.
