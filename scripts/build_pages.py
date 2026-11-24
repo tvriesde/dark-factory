@@ -18,9 +18,13 @@ PUBLIC_EXTENSIONS = {
 def build(root: Path, destination: Path) -> None:
     template = (root / "scripts" / "pages-index.html").read_text(encoding="utf-8")
     source = root / "use-case"
+    workflow = root / "agent-workflow.html"
     if source.is_symlink():
         raise ValueError(f"Use-case root must not be a symlink: {source}")
+    if workflow.is_symlink():
+        raise ValueError(f"Agent workflow must not be a symlink: {workflow}")
     destination.mkdir(parents=True, exist_ok=False)
+    copyfile(workflow, destination / workflow.name)
     links = []
     for case in sorted(source.iterdir()):
         if case.name.startswith("."):
