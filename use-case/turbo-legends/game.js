@@ -49,6 +49,7 @@ function setup(mode){
     career:["FOUR WORLDS / THREE ROUNDS","Career championship","Coast → Alps → Night City → Desert. Win a world's championship to unlock the next world and its cars."],
     trial:["YOU AGAINST THE CLOCK","Time trial","Set a personal best with your selected car. No rivals, just the road."]
   }[mode];
+  $("legendNow").hidden=mode!=="career";
   $("setupKicker").textContent=text[0];$("setupTitle").textContent=text[1];$("setupDescription").textContent=text[2];
   renderTracks();showPage("setup");
 }
@@ -56,10 +57,10 @@ function trackUnlocked(id){return data.tracks.includes(id)}
 // ---------- Setup: world map (issue #21) ----------
 // Wide (x,y) and narrow ≤480px (nx,ny) marker positions in % of the map; left = label on the marker's left (wide only).
 const MAP_POS=[
-  {x:37,y:78,nx:34,ny:72,left:true},{x:90,y:74,nx:84,ny:80,left:true},{x:54,y:84,nx:52,ny:86},
-  {x:51,y:20,nx:52,ny:8},{x:14,y:20,nx:15,ny:8},{x:29,y:66,nx:18,ny:62},
-  {x:88,y:28,nx:86,ny:14,left:true},{x:30,y:32,nx:30,ny:22},{x:83,y:42,nx:86,ny:40,left:true},
-  {x:54,y:40,nx:56,ny:36,left:true},{x:15,y:49,nx:13,ny:36},{x:64,y:56,nx:68,ny:58}
+  {x:37,y:78,nx:35,ny:71,left:true},{x:90,y:72,nx:84,ny:80,left:true},{x:54,y:86,nx:52,ny:87},
+  {x:51,y:15,nx:52,ny:8},{x:14,y:14,nx:18,ny:8},{x:29,y:66,nx:18,ny:56},
+  {x:88,y:28,nx:86,ny:14,left:true},{x:30,y:27,nx:30,ny:23},{x:86,y:42,nx:82,ny:40,left:true},
+  {x:55,y:40,nx:56,ny:36,left:true},{x:14,y:52,nx:17,ny:38},{x:64,y:56,nx:68,ny:58}
 ];
 const narrowQuery=window.matchMedia?matchMedia("(max-width: 480px)"):{matches:false};
 const mapButtons=[], tok={x:null,y:null,ang:0,raf:0,id:null};

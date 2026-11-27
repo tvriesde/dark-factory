@@ -149,7 +149,7 @@ Desktop (>480px; map and details panel side by side above 800px, stacked at 481�
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Wide positions (x%, y% of the map; L = label left of marker): Vancouver 14,20 · Las Vegas 15,49 · Chicago 30,32 · La Paz 29,66 · Rio de Janeiro 37,78 L · Innsbruck 51,20 · Cairo 54,40 L · Cape Town 54,84 · Dubai 64,56 · Hong Kong 83,42 L · Tokyo 88,28 L · Sydney 90,74 L.
+Wide positions (x%, y% of the map; L = label left of marker): Vancouver 14,14 · Las Vegas 14,52 · Chicago 30,27 · La Paz 29,66 · Rio de Janeiro 37,78 L · Innsbruck 51,15 · Cairo 55,40 L · Cape Town 54,86 · Dubai 64,56 · Hong Kong 86,42 L · Tokyo 88,28 L · Sydney 90,72 L.
 
 Narrow (≤480px, portrait map 3:4.4, labels under markers, three region bands)
 
@@ -172,14 +172,15 @@ Narrow (≤480px, portrait map 3:4.4, labels under markers, three region bands)
 └──────────────────────────────────────┘
 ```
 
-Narrow positions (x%, y%): Vancouver 15,8 · Chicago 30,22 · Las Vegas 13,36 · La Paz 18,62 · Rio de Janeiro 34,72 · Innsbruck 52,8 · Cairo 56,36 · Cape Town 52,86 · Tokyo 86,14 · Hong Kong 86,40 · Dubai 68,58 · Sydney 84,80.
+Narrow positions (x%, y%): Vancouver 18,8 · Chicago 30,23 · Las Vegas 17,38 · La Paz 18,56 · Rio de Janeiro 35,71 · Innsbruck 52,8 · Cairo 56,36 · Cape Town 52,87 · Tokyo 86,14 · Hong Kong 82,40 · Dubai 68,58 · Sydney 84,80.
 
 Build notes
 - Map art is inline SVG: ocean #13233b, simplified original land shapes #1f3350 with #344157 stroke; the narrow version uses three region band panels. No tiles, fonts or images are loaded.
 - Two position sets, switched by `matchMedia("(max-width:480px)")`; on change the token snaps and the career route is redrawn.
 - Each marker is a 32×32 hit area (world shape filled with the world colour) plus a text label on a dark plate (#0b1220) so it keeps ≥4.5:1 contrast over the map.
 - Label sizes: .82rem (≈13px) above 1000px; .75rem at 481–1000px; .7rem at ≤480px. The details panel is 240–320px wide above 800px (240px at 801–1100px). At 481–1100px the map uses a 3:2 aspect so the labels fit; above 1100px it is 2:1.
-- Overlap check: markers and labels do not overlap and stay inside the map at 320, 375, 480, 801 and 1440px (also checked 481–1920px in steps); no horizontal scroll at 320px.
+- Overlap check (measured in headless Chromium in Quick Race, Championship, Career and Time Trial): every city button (32px marker plus its label plate) stays inside the map with at least 7px to each edge at 320px (closest: Hong Kong 7.4px right, Las Vegas 7.8px left), so the 3px focus ring with its 3px offset is never clipped by the map's `overflow:hidden`. No two city buttons intersect at 320, 340, 375, 480, 481, 801 and 1440px (also checked 320–480px and 481–1920px in steps). No horizontal scroll at 320px.
+- Legend: the "NOW · Current round" key is shown only in Career mode, the only mode that uses the NOW badge.
 
 Marker states
 
