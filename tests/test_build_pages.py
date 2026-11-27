@@ -16,6 +16,7 @@ class PagesBuildTests(unittest.TestCase):
             copyfile(ROOT / "scripts" / "pages-index.html", root / "scripts" / "pages-index.html")
             copyfile(ROOT / "agent-workflow.html", root / "agent-workflow.html")
             (case / "index.html").write_text("Example", encoding="utf-8")
+            (case / "example.csv").write_text("symbol,shares,average_cost\nMSFT,1,100\n", encoding="utf-8")
             (case / "design.md").write_text("Not public", encoding="utf-8")
 
             destination = Path(temp_dir) / "site"
@@ -29,6 +30,10 @@ class PagesBuildTests(unittest.TestCase):
                 (root / "agent-workflow.html").read_bytes(),
             )
             self.assertEqual((destination / "use-case/example/index.html").read_text(), "Example")
+            self.assertEqual(
+                (destination / "use-case/example/example.csv").read_text(),
+                "symbol,shares,average_cost\nMSFT,1,100\n",
+            )
             self.assertFalse((destination / "use-case/example/design.md").exists())
 
     def test_rejects_symlinked_workflow(self):
