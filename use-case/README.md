@@ -21,6 +21,6 @@ Open `http://127.0.0.1:8000/use-case/<slug>/`. See the
 [team setup](../README.md) to request or update a case.
 
 After the PR is merged into `main`, GitHub Actions publishes the case in the
-generated Pages catalog. The build includes HTML, CSS, JavaScript, JSON, and
-common image, font and media files, but excludes `design.md` and hidden files.
-Treat all content embedded in publishable files as public.
+generated Pages catalog. The build includes HTML, CSS, JavaScript, JSON, CSV,
+and common image, font and media files, but excludes `design.md` and hidden
+files. Treat all content embedded in publishable files as public.

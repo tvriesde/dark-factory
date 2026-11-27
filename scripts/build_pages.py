@@ -9,7 +9,7 @@ from shutil import copyfile
 ROOT = Path(__file__).resolve().parents[1]
 SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 PUBLIC_EXTENSIONS = {
-    ".html", ".css", ".js", ".mjs", ".json",
+    ".html", ".css", ".js", ".mjs", ".json", ".csv",
     ".svg", ".png", ".jpg", ".jpeg", ".webp", ".avif", ".gif", ".ico",
     ".woff", ".woff2", ".ttf", ".mp3", ".mp4", ".webm", ".ogg",
 }

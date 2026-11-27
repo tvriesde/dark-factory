@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f5f0">
+  <title>Portfolio — Northstar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Northstar portfolio home"><span class="brand-mark" aria-hidden="true">N</span> northstar<span class="brand-light">/</span></a>
+      <div class="account-switcher"><span class="avatar" aria-hidden="true">J</span><span>Personal portfolio</span><span class="chevron" aria-hidden="true">⌄</span></div>
+    </header>
+
+    <main>
+      <section class="page-heading" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">YOUR MONEY, IN ONE PLACE</p>
+          <h1 id="page-title">Portfolio overview</h1>
+          <p class="subtitle">A clearer view of the positions you’re tracking.</p>
+        </div>
+        <div class="actions">
+          <a class="button button-secondary" href="example-portfolio.csv" download><span aria-hidden="true">↓</span> Example CSV</a>
+          <label class="button button-primary upload-button" for="csv-file"><span aria-hidden="true">↑</span> Import positions</label>
+          <input id="csv-file" class="visually-hidden" type="file" accept=".csv,text/csv">
+        </div>
+      </section>
+
+      <p class="demo-notice"><span class="notice-dot" aria-hidden="true"></span><strong>Demo portfolio</strong><span>Example positions and sample prices only. No live Yahoo Finance connection.</span></p>
+
+      <section class="summary-grid" aria-label="Portfolio summary">
+        <article class="summary-card total-card">
+          <p class="card-label">TOTAL VALUE <span class="info" title="Positions with an example quote">i</span></p>
+          <p id="total-value" class="summary-value">$—</p>
+          <p class="summary-foot"><span id="daily-change" class="change-positive">—</span> <span>today</span></p>
+          <div class="sparkline" aria-hidden="true"><svg viewBox="0 0 260 48" preserveAspectRatio="none"><path d="M0 37 C18 35 19 24 37 28 S61 41 78 30 101 19 115 24 139 33 154 18 179 28 192 14 216 24 230 9 250 15 260 4" /></svg></div>
+        </article>
+        <article class="summary-card">
+          <p class="card-label">INVESTED</p>
+          <p id="invested-value" class="summary-value">$—</p>
+          <p class="summary-foot">Across <span id="holding-count">—</span> positions</p>
+        </article>
+        <article class="summary-card">
+          <p class="card-label">TOTAL RETURN</p>
+          <p id="return-value" class="summary-value">$—</p>
+          <p id="return-percent" class="summary-foot">—</p>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel holdings-panel" aria-labelledby="holdings-title">
+          <div class="panel-heading">
+            <div><p class="eyebrow">YOUR INVESTMENTS</p><h2 id="holdings-title">Holdings <span id="holding-count-badge" class="count-badge">0</span></h2></div>
+            <span class="updated-label"><span class="status-dot" aria-hidden="true"></span> Sample data</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <caption class="visually-hidden">Portfolio positions. Scroll horizontally within this table on narrow screens to view all columns.</caption>
+              <thead><tr><th scope="col">ASSET</th><th scope="col">SHARES</th><th scope="col">AVG. COST</th><th scope="col">SAMPLE PRICE</th><th scope="col">VALUE</th><th scope="col">RETURN</th></tr></thead>
+              <tbody id="holdings-body"></tbody>
+            </table>
+          </div>
+          <p id="portfolio-status" class="status-message" role="status" aria-live="polite">Showing example positions. Import a CSV to view your own.</p>
+        </article>
+
+        <aside class="panel allocation-panel" aria-labelledby="allocation-title">
+          <div class="panel-heading"><div><p class="eyebrow">AT A GLANCE</p><h2 id="allocation-title">Allocation</h2></div><span class="allocation-total">By position</span></div>
+          <ul id="allocation-list" class="allocation-list"></ul>
+          <div class="allocation-foot"><span class="foot-indicator" aria-hidden="true"></span><span>Share of quoted positions</span></div>
+        </aside>
+      </section>
+
+      <section class="import-help" aria-labelledby="format-title">
+        <div class="help-icon" aria-hidden="true">↗</div>
+        <div><h2 id="format-title">Bring your portfolio with you</h2><p>Import a CSV with <code>symbol</code>, <code>shares</code>, and <code>average_cost</code> columns. Your file stays in this browser session.</p></div>
+        <a class="text-button" href="example-portfolio.csv" download>Get the example <span aria-hidden="true">→</span></a>
+      </section>
+    </main>
+
+    <footer><span>NORTHSTAR <span class="footer-divider">/</span> PORTFOLIO TRACKER</span><span>Example data only · Not investment advice</span></footer>
+  </div>
+</body>
+</html>
