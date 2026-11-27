@@ -36,7 +36,54 @@
     </section>
     <section id="setup" class="screen" hidden>
       <button class="back" data-page="home">← Back to home</button><p class="eyebrow" id="setupKicker"></p><h1 id="setupTitle"></h1><p id="setupDescription" class="lead"></p>
-      <div class="setup-layout"><div><div id="trackList" class="track-list"></div></div><aside class="panel"><p class="eyebrow">RACE DETAILS</p><h2 id="selectedTrack"></h2><p id="trackDetail"></p><label for="difficulty">AI difficulty</label><select id="difficulty"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select><p id="setupNote" class="hint"></p><button id="startRace" class="primary full">Start race →</button></aside></div>
+      <div class="setup-layout"><div class="map-block">
+        <p id="mapLabel" class="eyebrow">WORLD MAP</p>
+        <div id="worldMap" class="world-map" role="group" aria-labelledby="mapLabel" aria-describedby="mapHelp">
+          <svg class="map-art map-wide" viewBox="0 0 200 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <rect width="200" height="100" fill="#13233b"/>
+            <g fill="#1f3350" stroke="#344157" stroke-width=".6" stroke-linejoin="round">
+              <path d="M10 12L28 6L56 6L72 10L74 18L68 24L64 32L58 38L50 42L42 48L36 52L30 50L24 44L16 36L10 26L6 18Z"/>
+              <path d="M36 52L44 55L50 60L48 62L42 58Z"/>
+              <path d="M50 60L62 62L76 68L78 76L70 86L62 94L56 96L54 86L52 76L48 66Z"/>
+              <path d="M90 10L110 8L120 12L116 20L108 24L100 28L94 24L88 18Z"/>
+              <path d="M94 30L112 28L124 34L130 42L128 54L120 64L116 76L110 86L104 88L100 78L98 64L92 52L88 40Z"/>
+              <path d="M122 38L136 42L140 52L132 60L126 56L124 46Z"/>
+              <path d="M120 12L150 6L180 8L192 16L186 24L176 26L172 34L166 40L158 42L150 48L142 44L134 36L124 30L118 22Z"/>
+              <path d="M140 44L150 46L146 58L142 56Z"/>
+              <path d="M180 20L186 22L182 34L176 33Z"/>
+              <path d="M158 54L172 56L168 60L156 58Z"/>
+              <path d="M160 70L176 66L190 72L192 84L182 90L168 88L160 80Z"/>
+            </g>
+          </svg>
+          <svg class="map-art map-narrow" viewBox="0 0 300 440" aria-hidden="true" focusable="false">
+            <rect width="300" height="440" fill="#13233b"/>
+            <g fill="#172a45" stroke="#344157" stroke-width="1"><rect x="2" y="2" width="122" height="436" rx="6"/><rect x="128" y="2" width="62" height="436" rx="6"/><rect x="194" y="2" width="104" height="436" rx="6"/></g>
+            <g fill="#1f3350" stroke="#344157" stroke-width="1" stroke-linejoin="round">
+              <path d="M14 18L60 10L104 20L110 60L96 110L84 150L60 170L34 160L16 120L10 60Z"/>
+              <path d="M44 220L80 230L104 280L100 320L84 370L66 400L54 380L46 320L36 260Z"/>
+              <path d="M140 14L178 12L184 40L170 60L146 58L136 36Z"/>
+              <path d="M140 110L176 106L186 160L184 230L172 300L162 380L148 390L144 320L136 220L132 150Z"/>
+              <path d="M200 20L258 14L292 30L294 90L284 160L262 190L236 196L214 170L204 120L198 60Z"/>
+              <path d="M200 220L232 230L236 270L214 280L202 256Z"/>
+              <path d="M220 320L270 314L292 340L290 380L262 396L232 386L218 356Z"/>
+            </g>
+            <g fill="#8a9bb4" font-size="9" font-weight="700" letter-spacing="1" text-anchor="middle" font-family="system-ui,sans-serif"><text x="63" y="430">AMERICAS</text><text x="159" y="420">EUROPE</text><text x="159" y="431">AFRICA</text><text x="246" y="430">ASIA·OCEANIA</text></g>
+          </svg>
+          <svg id="mapRoute" class="map-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"></svg>
+          <span id="mapToken" class="map-token" aria-hidden="true"></span>
+        </div>
+        <p id="mapHelp" class="hint">Arrow keys move between cities. Enter or Space selects.</p>
+        <p id="mapPreview" class="map-preview"></p>
+        <ul class="map-legend" aria-label="Map key">
+          <li><span class="key-shape w0" aria-hidden="true"></span>Coast</li>
+          <li><span class="key-shape w1" aria-hidden="true"></span>Alps</li>
+          <li><span class="key-shape w2" aria-hidden="true"></span>Night City</li>
+          <li><span class="key-shape w3" aria-hidden="true"></span>Desert</li>
+          <li><span class="key-sym" aria-hidden="true">✓</span>Selected</li>
+          <li><span class="key-sym key-lock" aria-hidden="true"><span class="lock"></span></span>Locked</li>
+          <li><span class="key-sym key-now" aria-hidden="true">NOW</span>Current round</li>
+        </ul>
+      </div><aside class="panel"><p class="eyebrow">RACE DETAILS</p><h2 id="selectedTrack"></h2><p id="trackDetail"></p><label for="difficulty">AI difficulty</label><select id="difficulty"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select><p id="setupNote" class="hint"></p><button id="startRace" class="primary full">Start race →</button></aside></div>
     </section>
     <section id="prerace" class="screen" hidden aria-labelledby="preraceTitle">
       <div class="panel prerace-card"><p class="eyebrow" id="preraceKicker">NEXT RACE</p><h1 id="preraceTitle"></h1><p id="preraceDetail" class="lead"></p>
