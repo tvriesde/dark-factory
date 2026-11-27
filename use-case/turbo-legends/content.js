@@ -41,6 +41,38 @@ const WORLDS = [
       {kind:"dsign",w:.35,cw:.1,weight:1,min:1.25,max:1.5}
     ]}
 ];
+// City themes (issue #21), indexed by track id. Colours, parallax layers and two extra roadside props per track.
+// Tunnels, haze, edge props, AI pace and unlocks still come from WORLDS[world]. All landmark art is drawn in code.
+const darkHex=(hex,f)=>"#"+[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*f).toString(16).padStart(2,"0")).join("");
+const CITIES=[
+  ["Rio de Janeiro","#87b9d1","#3f86b4","#a9cfe0","#8fbf8a","#759d80","#5b5f66",["#d94a3d","#f2efe6"],"#f2efe6",["rioBay","rioHillside"],
+    [{kind:"lifeguard",w:.7,cw:.5,min:1.8,max:3.2},{kind:"kiosk",w:.9,cw:.7,min:1.9,max:3.4}]],
+  ["Sydney","#8ccbe8","#2c7fc9","#b4dcef","#7fb877","#5f9a62","#5a6068",["#1f5fa8","#f2efe6"],"#f2efe6",["sydHarbour","sydCity"],
+    [{kind:"jacaranda",w:.6,cw:.15,min:1.3,max:3.2},{kind:"wharfsign",w:.4,cw:.12,min:1.25,max:1.6}]],
+  ["Cape Town","#9fc0d0","#56809f","#c6d6de","#a3b783","#879a68","#5e5f63",["#f2c230","#2b6f4a"],"#f2efe6",["capeTable","capeRows"],
+    [{kind:"bathbox",w:.8,cw:.7,min:1.8,max:3.2},{kind:"protea",w:.45,cw:.3,min:1.25,max:1.8}]],
+  ["Innsbruck","#90bbd2","#4d86b3","#d6e6ee","#a9c4bd","#8aa7a1","#5d6168",["#d94a3d","#f2efe6"],"#f2efe6",["innPeaks","innOldTown"],
+    [{kind:"gondola",w:.6,cw:.3,min:1.8,max:3.4},{kind:"gable",w:1,cw:.9,min:2.2,max:3.6}]],
+  ["Vancouver","#8aaabf","#3d6688","#c2d2dc","#7fa58c","#628a72","#555b61",["#e05a2a","#f2efe6"],"#f2efe6",["vanCoastRange","vanCedars"],
+    [{kind:"maple",w:.6,cw:.18,min:1.3,max:3.4},{kind:"shelter",w:.9,cw:.7,min:1.8,max:3.2}]],
+  ["La Paz","#5f9fdc","#1b55a3","#b0cdea","#b9a37f","#9d8865","#66605a",["#d9302f","#f2d24a"],"#f2efe6",["lpzIllimani","lpzSlopes"],
+    [{kind:"cablecar",w:.6,cw:.3,min:1.8,max:3.4},{kind:"stall",w:.9,cw:.7,min:1.8,max:3.2}]],
+  ["Tokyo","#1b1b3a","#080818","#26264a","#3e4664","#2f3650","#3a3d4a",["#e040c8","#f2efe6"],"#f6e9ff",["tkyTower","tkySigns"],
+    [{kind:"vending",w:.4,cw:.35,min:1.25,max:1.8},{kind:"lantern",w:.35,cw:.12,min:1.25,max:1.6}]],
+  ["Chicago","#1a2338","#060a15","#22304a","#3a4553","#2c3440","#3d4047",["#2f9be0","#f2efe6"],"#f6e9ff",["chiLakefront","chiElevated"],
+    [{kind:"girder",w:.6,cw:.3,min:1.8,max:3.4},{kind:"clock",w:.35,cw:.12,min:1.25,max:1.7}]],
+  ["Hong Kong","#26173c","#0c0619","#33204c","#403c5c","#302c46","#3b3946",["#ff4a4a","#ffd84a"],"#f6e9ff",["hkgPeak","hkgHarbour"],
+    [{kind:"bamboo",w:.8,cw:.6,min:1.9,max:3.4},{kind:"tramsign",w:.35,cw:.12,min:1.25,max:1.6}]],
+  ["Cairo","#e6a976","#c9744f","#e9b98a","#d8a26e","#c89261","#6a5f58",["#e8772e","#f6efe2"],"#f6efe2",["caiPyramids","caiDomes"],
+    [{kind:"datepalm",w:.55,cw:.14,min:1.3,max:3.4},{kind:"obelisk",w:.4,cw:.3,min:1.25,max:1.8}]],
+  ["Las Vegas","#f0a878","#7c4a8c","#f2c09c","#cf8a5a","#b6744a","#655a57",["#ff3f8a","#f6efe2"],"#f6efe2",["lvsRedRock","lvsStrip"],
+    [{kind:"marquee",w:.5,cw:.15,min:1.3,max:1.8},{kind:"joshua",w:.55,cw:.2,min:1.3,max:3.4}]],
+  ["Dubai","#f2c58e","#d68c4c","#f5d3a6","#e6c088","#d2a670","#6e655c",["#1fa39a","#f6efe2"],"#f6efe2",["dxbSpire","dxbDunes"],
+    [{kind:"windtower",w:.9,cw:.8,min:2,max:3.6},{kind:"camelsign",w:.4,cw:.1,min:1.25,max:1.6}]]
+].map(([city,sky,skyTop,fog,groundLight,groundDark,road,rumble,lane,parallax,props],id)=>{
+  const w=WORLDS[Math.floor(id/3)]; // a city that keeps its world's road also keeps the world's dark road shade
+  return {city,sky,skyTop,fog,groundLight,groundDark,road,roadDark:road===w.road?w.roadDark:darkHex(road,.93),rumble,lane,parallax,props};
+});
 // Hand-written layouts: [segments, curve (-6..6, + = right), hill (-60..60, height change), tunnel?]
 // Hills in each list sum to zero so a lap ends where it started.
 const LAYOUTS = [

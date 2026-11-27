@@ -49,42 +49,131 @@ function setup(mode){
     career:["FOUR WORLDS / THREE ROUNDS","Career championship","Coast → Alps → Night City → Desert. Win a world's championship to unlock the next world and its cars."],
     trial:["YOU AGAINST THE CLOCK","Time trial","Set a personal best with your selected car. No rivals, just the road."]
   }[mode];
+  $("legendNow").hidden=mode!=="career";
   $("setupKicker").textContent=text[0];$("setupTitle").textContent=text[1];$("setupDescription").textContent=text[2];
   renderTracks();showPage("setup");
 }
 function trackUnlocked(id){return data.tracks.includes(id)}
-function renderTracks(){
-  const list=$("trackList");list.replaceChildren();
+// ---------- Setup: world map (issue #21) ----------
+// Wide (x,y) and narrow ≤480px (nx,ny) marker positions in % of the map; left = label on the marker's left (wide only).
+const MAP_POS=[
+  {x:37,y:78,nx:35,ny:71,left:true},{x:90,y:72,nx:84,ny:80,left:true},{x:54,y:86,nx:52,ny:87},
+  {x:51,y:15,nx:52,ny:8},{x:14,y:14,nx:18,ny:8},{x:29,y:66,nx:18,ny:56},
+  {x:88,y:28,nx:86,ny:14,left:true},{x:30,y:27,nx:30,ny:23},{x:86,y:42,nx:82,ny:40,left:true},
+  {x:55,y:40,nx:56,ny:36,left:true},{x:14,y:52,nx:17,ny:38},{x:64,y:56,nx:68,ny:58}
+];
+const narrowQuery=window.matchMedia?matchMedia("(max-width: 480px)"):{matches:false};
+const mapButtons=[], tok={x:null,y:null,ang:0,raf:0,id:null};
+let mapFocus=0;
+const dots=t=>"●".repeat(t.difficulty)+"○".repeat(3-t.difficulty);
+function mapSelected(){return setupMode==="career"?careerTrack():setupMode==="cup"?cupTrack():selectedTrack}
+function cityOpen(id){return setupMode==="cup"?TRACKS[id].world<=data.world:trackUnlocked(id)}
+// Existing lock reasons, unchanged wording.
+function lockReason(id){const t=TRACKS[id];if(setupMode==="cup")return "Locked: win the "+WORLDS[t.world-1].name+" career championship";
+  return t.world>data.world?"Win the "+WORLDS[t.world-1].name+" career championship":"Complete "+TRACKS[id-1].name+" to unlock"}
+function careerWorld(){return Math.floor(careerTrack()/3)}
+function cityContext(id){ // mode-specific extra state for names and previews
+  const t=TRACKS[id],round=id%3+1;
+  if(setupMode==="career"){if(t.world!==careerWorld())return {name:", view only",text:"View only"};const cur=careerTrack(),done=id<cur;
+    return {name:", career round "+round+" of 3"+(id===cur?", current round":done?", finished":""),text:"Career round "+round+" of 3"+(id===cur?" · current":done?" · finished":"")}}
+  if(setupMode==="cup"&&t.world===selectedWorld)return {name:", round "+round+" of 3 in "+WORLDS[t.world].name+" championship",text:"Round "+round+" of 3"};
+  return {name:"",text:""};
+}
+// World marker shapes (not colour only): Coast circle, Alps triangle, Night City square, Desert diamond.
+function markerShape(w){
+  const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg"),el=document.createElementNS(ns,w===0?"circle":w===2?"rect":"polygon");
+  svg.setAttribute("viewBox","0 0 32 32");svg.setAttribute("focusable","false");
+  const a={0:{cx:16,cy:16,r:11},1:{points:"16,4 29,27 3,27"},2:{x:6,y:6,width:20,height:20,rx:2},3:{points:"16,2 30,16 16,30 2,16"}}[w];
+  for(const k in a)el.setAttribute(k,a[k]);el.setAttribute("class","shape-fill");el.style.setProperty("--fill",WORLDS[w].color);svg.append(el);return svg;
+}
+function buildMap(){
+  const map=$("worldMap"),tokenEl=$("mapToken");tokenEl.append(Object.assign(document.createElement("span"),{className:"car"}));
+  TRACKS.forEach(t=>{
+    const p=MAP_POS[t.id],b=document.createElement("button");b.type="button";b.className="city w"+t.world+(p.left?" label-left":"");b.dataset.id=t.id;
+    for(const k of ["x","y","nx","ny"])b.style.setProperty("--"+k,p[k]+"%");
+    const mk=document.createElement("span"),shape=document.createElement("span"),sym=document.createElement("span"),badge=document.createElement("span"),label=document.createElement("span");
+    mk.className="marker";mk.setAttribute("aria-hidden","true");shape.className="shape";sym.className="sym";badge.className="badge";
+    shape.append(markerShape(t.world));const lock=document.createElement("span");lock.className="lock";
+    label.className="city-label";label.textContent=CITIES[t.id].city;mk.append(shape,lock,sym,badge);b.append(mk,label);
+    b.addEventListener("click",()=>mapSelect(t.id));
+    b.addEventListener("pointerenter",()=>preview(t.id));b.addEventListener("pointerleave",()=>preview(document.activeElement&&document.activeElement.closest&&document.activeElement.closest(".city")?+document.activeElement.dataset.id:null));
+    b.addEventListener("focus",()=>{mapFocus=t.id;mapButtons.forEach((x,i)=>x.tabIndex=i===mapFocus?0:-1);preview(t.id)});
+    map.insertBefore(b,tokenEl);mapButtons.push(b);
+  });
+  map.addEventListener("focusout",e=>{if(!map.contains(e.relatedTarget))preview(null)});
+  map.addEventListener("keydown",e=>{
+    const b=e.target.closest(".city");if(!b)return;const id=+b.dataset.id;let n;
+    if(e.key==="ArrowRight"||e.key==="ArrowDown")n=Math.min(11,id+1);else if(e.key==="ArrowLeft"||e.key==="ArrowUp")n=Math.max(0,id-1);else if(e.key==="Home")n=0;else if(e.key==="End")n=11;else return;
+    e.preventDefault();mapFocus=n;mapButtons.forEach((x,i)=>x.tabIndex=i===n?0:-1);mapButtons[n].focus();
+  });
+  const onNarrow=()=>{if(tok.id!==null)moveToken(tok.id,false);drawRoute()};
+  if(narrowQuery.addEventListener)narrowQuery.addEventListener("change",onNarrow);else if(narrowQuery.addListener)narrowQuery.addListener(onNarrow);
+}
+function mapPoint(id){const p=MAP_POS[id],n=narrowQuery.matches;return {x:n?p.nx:p.x,y:n?p.ny:p.y}}
+function preview(id){
+  const s=mapSelected(),i=id===null||id===undefined?s:id,t=TRACKS[i],ctx2=cityContext(i);
+  const state=!cityOpen(i)?lockReason(i):(i===s?"Selected":"Unlocked")+(ctx2.text?" · "+ctx2.text:"");
+  $("mapPreview").textContent=CITIES[i].city+" – "+t.name+" · "+WORLDS[t.world].name+" · "+dots(t)+" · "+state;
+}
+function drawRoute(){
+  const svg=$("mapRoute");svg.replaceChildren();if(setupMode!=="career")return;
+  const w=careerWorld(),cur=careerTrack(),ns="http://www.w3.org/2000/svg";
+  for(let k=0;k<2;k++){const a=w*3+k,b=a+1,pa=mapPoint(a),pb=mapPoint(b),line=document.createElementNS(ns,"polyline");
+    line.setAttribute("points",pa.x+","+pa.y+" "+pb.x+","+pb.y);line.setAttribute("vector-effect","non-scaling-stroke");line.setAttribute("class",b<=cur?"route done":"route");svg.append(line)}
+}
+function placeToken(){const el=$("mapToken");el.style.left=tok.x+"%";el.style.top=tok.y+"%";el.firstChild.style.transform="rotate("+tok.ang+"rad)"}
+// Decorative car token: quadratic arc toward the selected city. Selection never waits for it.
+function moveToken(id,animate){
+  const to=mapPoint(id),map=$("worldMap"),W=map.clientWidth,H=map.clientHeight;cancelAnimationFrame(tok.raf);tok.raf=0;tok.id=id;
+  if(!animate||tok.x===null||reducedMotion()||$("setup").hidden||!W||!H){tok.x=to.x;tok.y=to.y;tok.ang=0;placeToken();return}
+  const x0=tok.x,y0=tok.y,cx=(x0+to.x)/2,cy=Math.max(0,(y0+to.y)/2-15),dist=Math.hypot((to.x-x0)*W/100,(to.y-y0)*H/100);
+  if(dist<1){tok.x=to.x;tok.y=to.y;tok.ang=0;placeToken();return}
+  const dur=Math.min(1200,400+.6*dist),start=performance.now();
+  const step=now=>{
+    const p=Math.min(1,(now-start)/dur),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,u=1-e;
+    tok.x=u*u*x0+2*u*e*cx+e*e*to.x;tok.y=u*u*y0+2*u*e*cy+e*e*to.y;
+    const dx=2*u*(cx-x0)+2*e*(to.x-cx),dy=2*u*(cy-y0)+2*e*(to.y-cy);if(dx||dy)tok.ang=Math.atan2(dy*H,dx*W)+Math.PI/2;
+    if(p>=1)tok.ang=0;placeToken();tok.raf=p<1?requestAnimationFrame(step):0;
+  };
+  tok.raf=requestAnimationFrame(step);
+}
+function renderTracks(){renderMap(false)}
+// Updates markers in place (no rebuild, so focus stays), then the details panel.
+function renderMap(animate){
+  const sel=mapSelected(),inMap=$("worldMap").contains(document.activeElement);if(!inMap)mapFocus=sel;
+  TRACKS.forEach(t=>{
+    const b=mapButtons[t.id],open=cityOpen(t.id),on=t.id===sel,c=cityContext(t.id),round=t.id%3+1;
+    const careerHere=setupMode==="career"&&t.world===careerWorld(),cupHere=setupMode==="cup"&&t.world===selectedWorld,now=setupMode==="career"&&t.id===careerTrack();
+    b.classList.toggle("locked",!open);b.classList.toggle("selected",on);b.classList.toggle("cup-world",cupHere);b.classList.toggle("now",now);
+    b.setAttribute("aria-pressed",String(on));b.setAttribute("aria-disabled",String(!open));b.tabIndex=t.id===mapFocus?0:-1;
+    b.querySelector(".sym").textContent=on?"✓":"";
+    b.querySelector(".badge").textContent=now?"NOW":careerHere||cupHere?String(round):"";
+    b.setAttribute("aria-label",CITIES[t.id].city+" – "+t.name+", "+WORLDS[t.world].name+", difficulty "+t.difficulty+" of 3, "+(open?"unlocked":"locked: "+lockReason(t.id).replace(/^Locked: /,""))+(on?", selected":"")+c.name);
+  });
+  $("mapToken").style.setProperty("--paint",(data.styles[data.selected]||defaultStyle()).paint);
+  if(tok.id!==sel||tok.x===null)moveToken(sel,animate);else if(!tok.raf)moveToken(sel,false);
+  drawRoute();
+  const hovered=$("worldMap").querySelector(".city:hover"),focused=inMap&&document.activeElement.closest(".city");
+  preview(focused?+focused.dataset.id:hovered?+hovered.dataset.id:null);
   if(setupMode==="cup"){
-    WORLDS.forEach((world,w)=>{
-      const open=w<=data.world,b=document.createElement("button");b.className="track"+(selectedWorld===w?" selected":"")+(open?"":" locked");
-      const title=document.createElement("strong"),small=document.createElement("small");title.textContent=world.name+" Championship";
-      const reason=!open?"Locked: win the "+WORLDS[w-1].name+" career championship":data.cup&&data.cup.world===w?"In progress · Round "+(data.cup.round+1)+" of 3":world.names.join(" · ");
-      small.textContent=reason;b.append(title,small);b.setAttribute("aria-pressed",String(selectedWorld===w));
-      b.addEventListener("click",()=>{if(!open){announce(reason);return}selectedWorld=w;selectedTrack=cupTrack();renderTracks()});
-      list.append(b);
-    });
     const c=data.cup&&data.cup.world===selectedWorld?data.cup:null;
     $("selectedTrack").textContent=WORLDS[selectedWorld].name+" Championship";
-    $("trackDetail").textContent="Rounds: "+WORLDS[selectedWorld].names.join(" → ")+" · 3 laps each";
+    $("trackDetail").textContent="Rounds: "+[0,1,2].map(k=>TRACKS[selectedWorld*3+k].name+" ("+CITIES[selectedWorld*3+k].city+")").join(" → ")+" · 3 laps each";
     $("setupNote").textContent=(c?"Continue: Round "+(c.round+1)+" of 3 · Your points "+c.points[0]+" · ":"")+"Points 10 / 8 / 6 / 5 / 4 / 3 / 2 / 1";
     $("difficulty").disabled=false;$("startRace").textContent=c?"Continue championship →":"Start championship →";
     return;
   }
-  TRACKS.forEach(t=>{
-    const b=document.createElement("button");b.className="track"+(selectedTrack===t.id?" selected":"")+(trackUnlocked(t.id)?"":" locked");
-    const title=document.createElement("strong"),small=document.createElement("small");title.textContent=t.name;
-    let reason=trackUnlocked(t.id)?"Unlocked · "+"●".repeat(t.difficulty)+"○".repeat(3-t.difficulty):t.world>data.world?"Win the "+WORLDS[t.world-1].name+" career championship":"Complete "+TRACKS[t.id-1].name+" to unlock";
-    if(setupMode==="career")reason=t.id===selectedTrack?"Championship round "+(t.id%3+1):Math.floor(t.id/3)===Math.floor(selectedTrack/3)?"Round "+(t.id%3+1):t.world>data.world?"Locked world":"Career world";
-    small.textContent=WORLDS[t.world].name+" · "+reason;b.append(title,small);b.setAttribute("aria-pressed",String(selectedTrack===t.id));
-    b.addEventListener("click",()=>{if(setupMode==="career"){announce("Career tracks follow the championship round order.");return}if(!trackUnlocked(t.id)){announce(reason);return}selectedTrack=t.id;renderTracks()});
-    list.append(b);
-  });
   const t=TRACKS[selectedTrack],best=data.bests[t.id+":"+data.selected];$("selectedTrack").textContent=t.name;
-  $("trackDetail").textContent=WORLDS[t.world].name+" · Difficulty "+t.difficulty+"/3 · "+t.laps+" laps"+(WORLDS[t.world].tunnel?" · tunnels":"")+(WORLDS[t.world].haze?" · sandstorm haze":"");
+  $("trackDetail").textContent=CITIES[t.id].city+" · "+WORLDS[t.world].name+" · Difficulty "+t.difficulty+"/3 · "+t.laps+" laps"+(WORLDS[t.world].tunnel?" · tunnels":"")+(WORLDS[t.world].haze?" · sandstorm haze":"");
   $("setupNote").textContent=setupMode==="career"?"Round "+((data.championship?.round||0)+1)+" of 3 · 10 / 8 / 6 / 5 / 4 / 3 / 2 / 1 points":setupMode==="trial"?"Selected car: "+CARS[data.selected].name+" · Best "+(best?timeText(best):"none yet")+" · Completion $"+REWARDS.completion+", beat your best +$"+REWARDS.pb:"Selected car: "+CARS[data.selected].name;
   $("difficulty").disabled=setupMode==="trial";
   $("startRace").textContent=setupMode==="trial"?"Start time trial →":setupMode==="career"&&data.championship?"Continue career →":"Start race →";
+}
+function mapSelect(id){
+  if(setupMode==="career"){announce("Career tracks follow the championship round order.");preview(id);return}
+  if(!cityOpen(id)){announce(lockReason(id));preview(id);return}
+  if(setupMode==="cup"){selectedWorld=TRACKS[id].world;selectedTrack=cupTrack()}else selectedTrack=id;
+  const s=mapSelected();announce(CITIES[s].city+" – "+TRACKS[s].name+" selected.");renderMap(true);
 }
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>{audioStart();const target=b.dataset.page;if(["quick","career","trial","cup"].includes(target))setup(target);else showPage(target)}));
 $("brand").addEventListener("click",e=>{e.preventDefault();if(page==="race"){showPause();return}showPage("home")});
@@ -105,7 +194,7 @@ function showPrerace(){
   const id=raceTrackId(),t=TRACKS[id],obj=OBJECTIVES[id%3],diff=$("difficulty").value,series=setupMode==="career"?data.championship:setupMode==="cup"?(data.cup&&data.cup.world===t.world?data.cup:null):null;
   $("preraceKicker").textContent=setupMode==="career"?"CAREER":setupMode==="cup"?"CHAMPIONSHIP":"QUICK RACE";
   $("preraceTitle").textContent=t.name;
-  $("preraceDetail").textContent=WORLDS[t.world].name+" · "+t.laps+" laps · "+diff[0].toUpperCase()+diff.slice(1)+" rivals"+(setupMode!=="quick"?" · Round "+((series?.round||0)+1)+" of 3":"")+" · "+CARS[data.selected].name;
+  $("preraceDetail").textContent=CITIES[id].city+" · "+WORLDS[t.world].name+" · "+t.laps+" laps · "+diff[0].toUpperCase()+diff.slice(1)+" rivals"+(setupMode!=="quick"?" · Round "+((series?.round||0)+1)+" of 3":"")+" · "+CARS[data.selected].name;
   const ul=$("preraceRewards");ul.replaceChildren();
   const P=REWARDS.places,lines=["1st $"+P[0]+" · 2nd $"+P[1]+" · 3rd $"+P[2]+" · 4th–8th $"+P[3]+"–$"+P[7],"Completion $"+REWARDS.completion+" · Win bonus $"+REWARDS.win,"New personal best $"+REWARDS.pb+" (when you beat your saved best)"];
   if(setupMode!=="quick")lines.push("Points 10 / 8 / 6 / 5 / 4 / 3 / 2 / 1"+(series?" · Your points "+series.points[0]:""));
@@ -302,4 +391,4 @@ function frame(now){
   }
   requestAnimationFrame(frame);
 }
-showWarning();updateWallet();selectedCar=data.selected;draft={...(data.styles[selectedCar]||defaultStyle())};showPage("home");requestAnimationFrame(t=>{lastFrame=t;frame(t)});
+showWarning();updateWallet();buildMap();selectedCar=data.selected;draft={...(data.styles[selectedCar]||defaultStyle())};showPage("home");requestAnimationFrame(t=>{lastFrame=t;frame(t)});

@@ -4,7 +4,9 @@ const SEG=200, ROAD_W=1500, CAM_H=1000, DRAW_DIST=200, TUNNEL_H=2600;
 function seeded(seed){let s=(seed*2654435761+12345)>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
 const easeIn=(a,b,p)=>a+(b-a)*p*p, easeInOut=(a,b,p)=>a+(b-a)*(-Math.cos(p*Math.PI)/2+.5);
 function buildTrack(def){
-  const world=WORLDS[def.world], segs=[]; let y=0;
+  // Theme = world traits (tunnel, haze, edge, props) + the track's city colours and layers (issue #21).
+  const base=WORLDS[def.world], {props:cityProps=[],...city}=CITIES[def.id]||{};
+  const world={...base,...city,name:base.name}, segs=[]; let y=0;
   for(const s of def.sections){
     const enter=Math.max(1,Math.round(s.n*.25)), leave=enter, hold=s.n-enter-leave, y0=y, y1=y+s.hill*SEG;
     for(let k=0;k<s.n;k++){
@@ -17,7 +19,9 @@ function buildTrack(def){
   const N=segs.length, drift=y; // close any residual so the lap end meets the start
   segs.forEach(s=>{s.y1-=drift*s.i/N;s.y2-=drift*(s.i+1)/N});
   // Props: seeded by track id so each track keeps its own scenery.
-  const rnd=seeded(def.id+1), props=world.props, total=props.reduce((a,p)=>a+p.weight,0);
+  // City props share 45% of the pick weight, world props keep 55%. Same number of random calls as before.
+  const wt=base.props.reduce((a,p)=>a+p.weight,0), cw=wt*(.45/.55)/Math.max(1,cityProps.length);
+  const rnd=seeded(def.id+1), props=base.props.concat(cityProps.map(p=>({...p,weight:cw}))), total=props.reduce((a,p)=>a+p.weight,0);
   const pick=()=>{let r=rnd()*total;for(const p of props){if((r-=p.weight)<=0)return p}return props[0]};
   const add=(i,kind,offset,w,cw,flip)=>{if(segs[i]&&!segs[i].tunnel)segs[i].sprites.push({kind,offset,w,cw,solid:true,flip:!!flip})};
   const density=def.world===1?.3:def.world===2?.22:.2;
