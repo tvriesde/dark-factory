@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Santa's Gift Ideas</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <h1>Santa's Gift Ideas</h1>
+      <p class="intro">Click Santa to hear him laugh and get a gift idea for kids.</p>
+    </header>
+
+    <section class="stage" aria-label="Santa">
+      <p id="bubble" class="bubble" aria-hidden="true" hidden>Ho ho ho!</p>
+      <button id="santa" type="button" class="santa">
+        <svg class="santa-art" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+          <!-- Hat -->
+          <path d="M52 78 Q70 18 128 22 Q160 26 164 62 L150 70 Q142 44 120 44 Q92 46 82 78 Z" fill="#B3202A"/>
+          <circle cx="162" cy="66" r="11" fill="#FFFFFF" stroke="#E0DAD0" stroke-width="2"/>
+          <rect x="44" y="72" width="112" height="20" rx="10" fill="#FFFFFF" stroke="#E0DAD0" stroke-width="2"/>
+          <!-- Face -->
+          <circle cx="100" cy="112" r="34" fill="#F6CBA8"/>
+          <circle cx="88" cy="106" r="4" fill="#1F2A24"/>
+          <circle cx="112" cy="106" r="4" fill="#1F2A24"/>
+          <circle cx="78" cy="118" r="6" fill="#EE9A8E" opacity="0.7"/>
+          <circle cx="122" cy="118" r="6" fill="#EE9A8E" opacity="0.7"/>
+          <circle cx="100" cy="116" r="6" fill="#E58A7A"/>
+          <!-- Beard -->
+          <path d="M60 116 Q62 178 100 186 Q138 178 140 116 Q130 136 118 132 Q108 128 100 132 Q92 128 82 132 Q70 136 60 116 Z" fill="#FFFFFF" stroke="#E0DAD0" stroke-width="2"/>
+          <!-- Moustache -->
+          <path d="M100 124 Q88 118 76 126 Q86 134 100 128 Q114 134 124 126 Q112 118 100 124 Z" fill="#FFFFFF" stroke="#E0DAD0" stroke-width="2"/>
+          <!-- Laughing mouth -->
+          <path d="M90 136 Q100 150 110 136 Z" fill="#7A1A20"/>
+        </svg>
+        <span class="santa-caption">Ask Santa for a gift idea</span>
+      </button>
+      <div class="controls">
+        <button id="sound" type="button" class="sound" aria-pressed="true"><span aria-hidden="true" id="sound-icon">🔊</span> Sound <span aria-hidden="true" id="sound-state">On</span></button>
+        <button id="clear" type="button" class="clear" disabled>Clear ideas</button>
+      </div>
+    </section>
+
+    <section class="ideas-panel" aria-labelledby="ideas-title">
+      <h2 id="ideas-title">Gift ideas</h2>
+      <p id="empty" class="empty"><span aria-hidden="true">🎁</span> Click Santa to get gift ideas!</p>
+      <ul id="ideas" class="ideas" aria-labelledby="ideas-title"></ul>
+    </section>
+
+    <p id="status" class="visually-hidden" role="status" aria-live="polite"></p>
+
+    <footer class="page-footer">
+      <p><small>Ideas are made-up examples. No brands, prices or links.</small></p>
+    </footer>
+  </main>
+</body>
+</html>
