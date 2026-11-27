@@ -91,7 +91,7 @@ Contrast: `ink` on `paper` ≈ 12.7:1 (HUD pills and buttons); `ink-soft` outlin
 
 - Balloon centre fixed at x=180, y=448 (logical). Base radius 36 (large) or 16 (small). Collision hitbox = 0.9 × base radius. Visual squash or elastic overshoot never enlarges the hitbox (radius clamped to 16..36 before × 0.9).
 - Pickup radius interpolates 64 ↔ 20 with the same progress as the size tween, drawn as a dashed ring. A coin is collected when its distance is ≤ pickup + 10.
-- Coins: r10, gold with rim and sparkle. They appear only between rows, at least 20 units clear of a row. About 50% are off-centre at x = 180 ± (40–70), clamped to 10..350, so off-centre coins can only be reached while large.
+- Coins: r10, gold with rim and sparkle. They appear only between rows, at least 20 units clear of a row. About half of the optional coins are off-centre at x = 180 ± (40–70), clamped to 10..350, so off-centre coins can only be reached while large. Coins added to keep the 2.5 s / 3.5 s spacing are always centred, so overall roughly 35–40% of coins are off-centre.
 - Rows: `{y, h 24–40, gap, kind: block | pill | triangle}`. The left part spans x 0..180−gap/2 and the right part 180+gap/2..360. Gap-facing edges are vertical (block, triangle) or rounded outward (pill capsule, whose rounded tip ends exactly at the gap edge). Collision is exact per shape: circle–rect clamp, capsule segment distance, and triangle point-in-polygon or edge distance.
 - Gaps: wide 96–140, narrow 44–60, always centred.
 
@@ -144,7 +144,8 @@ Focus: Start on load, `#game` on play, Resume on pause, Restart on game over.
 - Pointer: `pointerdown` on `#game` while playing, with `setPointerCapture`. Release on pointerup, pointercancel, lostpointercapture or pointerleave. Multi-pointer ids are tracked.
 - Keyboard: hold Space to shrink (repeats ignored). Space/Enter starts or restarts on the start and game-over overlays without double-activating buttons. P or Esc pauses and resumes. M toggles mute anywhere. Space and arrow keys never scroll.
 - Hiding the page or losing window focus while playing or trapped clears input, re-inflates and pauses (no auto-resume).
-- Context menu suppressed. `touch-action: none`, no selection, no callout, no overscroll.
+- Context menu suppressed. `touch-action: none`, no selection, no callout, no overscroll. Overlay cards may scroll vertically on very short (landscape) screens.
+- Short screens (height ≤ 520 px, e.g. phones in landscape) use the full-viewport layout and a compact card.
 
 ## Copy
 

@@ -76,7 +76,7 @@
 
   function announce(msg) {
     live.textContent = "";
-    requestAnimationFrame(function () { live.textContent = msg; });
+    setTimeout(function () { live.textContent = msg; }, 50);
   }
 
   // ---- Size tween (visual radius; hitbox derives from clamped base radius) ----
